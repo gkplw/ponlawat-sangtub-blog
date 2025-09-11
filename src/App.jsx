@@ -1,5 +1,7 @@
-import NavBar from './components/Navbar'
-import HeroSection from './components/HeroSection'
+import ArticlesFilter from "./components/ArticleSection"
+import { NavBar } from "./components/PageComponent"
+import { HeroSection } from "./components/PageComponent"
+import { Footer } from "./components/PageComponent"
 
 function App() {
 
@@ -7,6 +9,8 @@ function App() {
     <>
       <NavBar />
       <HeroSection />
+      <ArticlesFilter />
+      <Footer />
     </>
   )
 }
