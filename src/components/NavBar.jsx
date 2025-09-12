@@ -5,7 +5,7 @@ import { Menu } from "lucide-react"
 export function NavBar() {
   return (
     <>
-      <nav className="flex items-center justify-between py-4 px-19 border-b bg-[#F9F8F6]">
+      <nav className="flex items-center justify-between py-4 px-4 border-b bg-[#F9F8F6]">
         <a href="/" className="text-2xl font-bold">
           hh<span className="text-green-500">.</span>
         </a>
@@ -44,7 +44,7 @@ export function NavBar() {
       </nav>
 
       {/* Mobile buttons - full width vertical layout */}
-      <div className="md:hidden px-19 py-6 bg-[#F9F8F6]">
+      <div className="md:hidden px-4 py-6 bg-[#F9F8F6]">
         <div className="flex flex-col space-y-4">
           <a href="/login" className="w-full py-4 bg-white rounded-full border text-center font-medium hover:bg-gray-50 transition-colors">
             Log in
