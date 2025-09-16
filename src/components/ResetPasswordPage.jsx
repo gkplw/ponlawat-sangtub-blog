@@ -1,0 +1,195 @@
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { NavBar } from "./NavBar";
+import { UserSidebar } from "./UserSidebar";
+import { ConfirmationModal } from "./ConfirmationModal";
+import { toast } from "sonner";
+
+export function ResetPasswordPage() {
+  const [formData, setFormData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmNewPassword: ""
+  });
+
+  const [errors, setErrors] = useState({});
+  const [isResetting, setIsResetting] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.currentPassword.trim()) {
+      newErrors.currentPassword = "Current password is required";
+    }
+
+    if (!formData.newPassword.trim()) {
+      newErrors.newPassword = "New password is required";
+    } else if (formData.newPassword.length < 6) {
+      newErrors.newPassword = "New password must be at least 6 characters";
+    }
+
+    if (!formData.confirmNewPassword.trim()) {
+      newErrors.confirmNewPassword = "Please confirm your new password";
+    } else if (formData.newPassword !== formData.confirmNewPassword) {
+      newErrors.confirmNewPassword = "Passwords do not match";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    // Clear error when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ""
+      }));
+    }
+  };
+
+  const handleResetClick = () => {
+    if (!validateForm()) {
+      return;
+    }
+    setShowModal(true);
+  };
+
+  const handleConfirmReset = async () => {
+    setIsResetting(true);
+    setShowModal(false);
+    
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success notification
+      toast.success("Password reset successfully", {
+        description: "Your password has been updated",
+        duration: 5000,
+      });
+      
+      // Clear form
+      setFormData({
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: ""
+      });
+      setErrors({});
+    } catch (error) {
+      console.error("Reset error:", error);
+      toast.error("Failed to reset password");
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#F9F8F6] flex flex-col">
+      <NavBar variant="user" />
+      
+      <div className="flex flex-col sm:flex-row flex-1">
+        <UserSidebar />
+        
+        {/* Main Content */}
+        <main className="flex-1 p-4 sm:p-6 min-h-0">
+          <div className="max-w-4xl">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Reset password</h1>
+            
+            {/* Password Reset Card */}
+            <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8">
+              <div className="space-y-4 sm:space-y-6">
+                {/* Current Password Field */}
+                <div>
+                  <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-600 mb-2">
+                    Current password
+                  </label>
+                  <Input
+                    id="currentPassword"
+                    name="currentPassword"
+                    type="password"
+                    value={formData.currentPassword}
+                    onChange={handleInputChange}
+                    className={`bg-white border-gray-300 ${errors.currentPassword ? 'border-red-500' : ''}`}
+                    placeholder="Current password"
+                  />
+                  {errors.currentPassword && (
+                    <p className="text-red-500 text-sm mt-1">{errors.currentPassword}</p>
+                  )}
+                </div>
+
+                {/* New Password Field */}
+                <div>
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-600 mb-2">
+                    New password
+                  </label>
+                  <Input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    value={formData.newPassword}
+                    onChange={handleInputChange}
+                    className={`bg-white border-gray-300 ${errors.newPassword ? 'border-red-500' : ''}`}
+                    placeholder="New password"
+                  />
+                  {errors.newPassword && (
+                    <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
+                  )}
+                </div>
+
+                {/* Confirm New Password Field */}
+                <div>
+                  <label htmlFor="confirmNewPassword" className="block text-sm font-medium text-gray-600 mb-2">
+                    Confirm new password
+                  </label>
+                  <Input
+                    id="confirmNewPassword"
+                    name="confirmNewPassword"
+                    type="password"
+                    value={formData.confirmNewPassword}
+                    onChange={handleInputChange}
+                    className={`bg-white border-gray-300 ${errors.confirmNewPassword ? 'border-red-500' : ''}`}
+                    placeholder="Confirm new password"
+                  />
+                  {errors.confirmNewPassword && (
+                    <p className="text-red-500 text-sm mt-1">{errors.confirmNewPassword}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Reset Button */}
+              <div className="mt-6 sm:mt-8 flex justify-center">
+                <Button
+                  onClick={handleResetClick}
+                  disabled={isResetting}
+                  className="px-6 sm:px-8 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
+                >
+                  {isResetting ? "Resetting..." : "Reset password"}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleConfirmReset}
+        title="Reset password"
+        message="Do you want to reset your password?"
+        confirmText="Reset"
+        cancelText="Cancel"
+      />
+    </div>
+  );
+}
