@@ -96,16 +96,31 @@ export function ResetPasswordPage() {
     <div className="min-h-screen bg-[#F9F8F6] flex flex-col">
       <NavBar variant="user" />
       
-      <div className="flex flex-col sm:flex-row flex-1">
-        <UserSidebar />
-        
-        {/* Main Content */}
-        <main className="flex-1 p-4 sm:p-6 min-h-0">
-          <div className="max-w-4xl">
-            <h1 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6">Reset password</h1>
+      {/* Main Content */}
+      <main className="flex-1 p-4 sm:p-6 min-h-0">
+        <div className="max-w-6xl mx-auto">
+          <div className="hidden sm:flex items-center mb-4 sm:mb-6">
+            <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-3">
+              <img 
+                src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&h=100&fit=crop&crop=face" 
+                alt="Profile" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <span className="text-xl sm:text-2xl font-bold text-[#75716B]">Moodeng ja</span>
+            <span className="text-xl sm:text-2xl text-gray-400 mx-3">|</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#26231E]">Reset password</span>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            {/* UserSidebar - Left side */}
+            <div className="sm:w-64 flex-shrink-0">
+              <UserSidebar />
+            </div>
             
-            {/* Password Reset Card */}
-            <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8">
+            {/* Password Reset Card - Right side */}
+            <div className="flex-1">
+              <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8 max-w-lg">
               <div className="space-y-4 sm:space-y-6">
                 {/* Current Password Field */}
                 <div>
@@ -175,10 +190,11 @@ export function ResetPasswordPage() {
                   {isResetting ? "Resetting..." : "Reset password"}
                 </Button>
               </div>
+              </div>
             </div>
           </div>
-        </main>
-      </div>
+        </div>
+      </main>
 
       {/* Confirmation Modal */}
       <ConfirmationModal

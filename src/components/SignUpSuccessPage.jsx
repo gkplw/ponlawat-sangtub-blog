@@ -9,7 +9,7 @@ export function SignUpSuccessPage() {
       <NavBar />
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8">
+      <main className="flex-1 flex items-start justify-center px-4 py-8 sm:py-12">
         <div className="w-full max-w-md">
           <div className="bg-[#efeeeb] rounded-2xl p-6 sm:p-8 text-center">
             {/* Success Icon */}

@@ -306,12 +306,15 @@ export function ArticlesFilter() {
         ))}
       </article>
 
-      {/* View More Button */}
+      {/* View More Link */}
       {!loading && page < totalPages && (
         <div className="flex justify-center mt-4">
-          <Button onClick={() => setPage((prev) => prev + 1)}>
+          <button 
+            onClick={() => setPage((prev) => prev + 1)}
+            className="text-[#26231E] hover:text-gray-600 underline cursor-pointer transition-colors"
+          >
             View more
-          </Button>
+          </button>
         </div>
       )}
 

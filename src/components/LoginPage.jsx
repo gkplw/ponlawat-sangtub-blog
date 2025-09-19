@@ -83,11 +83,11 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F8F6] flex flex-col">
+    <div className="bg-[#F9F8F6] flex flex-col min-h-screen">
       <NavBar />
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-4 sm:py-8">
+      <main className="flex justify-center px-4 mt-6 sm:mt-12 flex-1">
         <div className="w-full max-w-md">
           <div className="bg-[#efeeeb] rounded-2xl p-6 sm:p-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-6 sm:mb-8">

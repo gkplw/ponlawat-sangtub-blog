@@ -20,7 +20,7 @@ export function UserSidebar() {
   ];
 
   return (
-    <aside className="w-full sm:w-64 bg-[#F9F8F6] border-r border-gray-200 sm:min-h-screen">
+    <aside className="w-full sm:w-64 bg-[#F9F8F6] sm:min-h-screen">
       <nav className="p-4 sm:p-6 h-auto sm:h-full">
         <ul className="flex sm:flex-col space-x-2 sm:space-x-0 sm:space-y-2">
           {menuItems.map((item) => {

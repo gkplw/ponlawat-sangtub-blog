@@ -1,4 +1,4 @@
-import { NavBar } from "./components/Navbar"
+import { NavBar } from "./components/NavBar"
 import { HeroSection } from "./components/HeroSection"
 import { ArticlesFilter } from "./components/ArticleSection"
 import { ViewPostPage } from "./components/ViewPostPage"

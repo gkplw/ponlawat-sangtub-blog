@@ -21,7 +21,7 @@ export function Footer() {
             </div>
           </div>
 
-          <a href="/" className="text-gray-800 underline underline-offset-4 text-base">Home page</a>
+          <a href="/" className="text-[#26231E] hover:text-gray-600 underline underline-offset-4 text-base">Home page</a>
         </div>
       </footer>
     );
