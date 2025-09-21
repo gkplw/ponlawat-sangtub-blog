@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Edit, Trash2, Plus, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import { ConfirmationModal } from "../components/common/ConfirmationModal";
 import { toast } from "sonner";
 

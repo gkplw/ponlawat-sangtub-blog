@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { NavBar } from "./NavBar";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { NavBar } from "../components/layout/NavBar";
 
 export function SignUpPage() {
   const [formData, setFormData] = useState({

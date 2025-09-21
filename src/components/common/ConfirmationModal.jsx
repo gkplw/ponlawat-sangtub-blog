@@ -1,5 +1,5 @@
 import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "../ui/button";
 
 export function ConfirmationModal({ isOpen, onClose, onConfirm, title, message, confirmText = "Reset", cancelText = "Cancel" }) {
   if (!isOpen) return null;

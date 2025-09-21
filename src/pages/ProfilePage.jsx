@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { NavBar } from "./NavBar";
-import { UserSidebar } from "./UserSidebar";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
+import { NavBar } from "../components/layout/NavBar";
+import { UserSidebar } from "../components/layout/UserSidebar";
 import { toast } from "sonner";
 
 export function ProfilePage() {

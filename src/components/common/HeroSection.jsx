@@ -1,4 +1,4 @@
-import authorImage from "../assets/author-image.jpg";
+import authorImage from "../../assets/author-image.jpg";
 
 export function HeroSection() {
     return (

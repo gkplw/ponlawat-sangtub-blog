@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import authorImage from "../assets/author-image.jpg";
-import { HeartPlus, Copy, Facebook, Twitter, Linkedin } from 'lucide-react';
+import { HeartPlus, Copy, Facebook, Twitter, Linkedin, X } from 'lucide-react';
 import { toast } from "sonner";
 
 export function ViewPostPage() {
@@ -14,6 +14,7 @@ export function ViewPostPage() {
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [isLoggedIn] = useState(false); // สมมติว่าผู้ใช้ทุกคนยังไม่ได้เข้าสู่ระบบ
   const params = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -64,6 +65,16 @@ export function ViewPostPage() {
     }
   };
 
+  const handleCreateAccount = () => {
+    setShowLoginAlert(false);
+    navigate('/signup');
+  };
+
+  const handleLogin = () => {
+    setShowLoginAlert(false);
+    navigate('/login');
+  };
+
   if (errorMessage) {
     return (
       <p className="container px-4 py-8 text-red-500 text-center">
@@ -91,27 +102,28 @@ export function ViewPostPage() {
       {/* Login Alert Dialog */}
       {showLoginAlert && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-          <div className="relative mb-2">
-              <button
+          <div className="bg-[#efeeeb] rounded-lg p-6 max-w-md mx-4 relative">
+          <button
                 onClick={() => setShowLoginAlert(false)}
-                className="absolute right-0 top-0 text-gray-400 hover:text-gray-600"
+                className="absolute right-2 top-2 font-bold text-gray-400 hover:text-gray-600"
               >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <X className="w-5 h-5 text-gray-600" />
               </button>
+          <div className="relative mb-2">
               <h2 className="text-xl font-bold text-gray-900 text-center">
                 Create an account to continue
               </h2>
             </div>
 
-            <div className="flex flex-col gap-3">
-              <button className="bg-gray-900 text-white py-3 px-4 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+            <div className="flex flex-col gap-2">
+              <button 
+                onClick={handleCreateAccount}
+                className="px-6 w-fit py-2 self-center bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
+              >
                 Create account
               </button>
               <p className="text-center text-sm text-gray-600">
-                Already have an account? <span className="text-gray-900 underline cursor-pointer">Log in</span>
+                Already have an account? <span onClick={handleLogin} className="text-gray-900 underline cursor-pointer">Log in</span>
               </p>
             </div>
           </div>
@@ -139,61 +151,120 @@ export function ViewPostPage() {
           {post.title}
         </h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <div className="flex flex-col lg:flex-row gap-10">
           {/* Content */}
-          <article className="lg:col-span-8">
+          <article className="order-1 lg:flex-1 lg:w-2/3">
             <section className="markdown text-gray-700">
               <ReactMarkdown>{post.content}</ReactMarkdown>
             </section>
 
         {/* Like / Share */}
-            <div className="mt-8 flex items-center justify-between rounded-lg p-3 bg-[#EFEEEB] flex-wrap gap-4">
-              <button 
-                onClick={handleLike}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-colors ${
-                  isLiked 
-                    ? 'bg-red-100 text-red-600 hover:bg-red-200' 
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                <HeartPlus className={isLiked ? 'fill-current' : ''} />
-                <span className="text-sm">{post ? (isLiked ? likeCount : post.likes) : 0}</span>
-              </button>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleCopy}
-                  className="bg-white rounded-full px-4 py-2 shadow-sm text-sm text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+            <div className="mt-8 rounded-lg p-3 bg-[#EFEEEB] space-y-3 lg:space-y-0">
+              {/* Mobile Layout */}
+              <div className="lg:hidden">
+                {/* Like button - full width */}
+                <button 
+                  onClick={handleLike}
+                  className={`w-full flex items-center justify-center gap-2 rounded-full px-4 py-2 shadow-sm transition-colors ${
+                    isLiked 
+                      ? 'bg-red-100 text-red-600 hover:bg-red-200' 
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
-                  <Copy />
-                  Copy link
+                  <HeartPlus className={isLiked ? 'fill-current' : ''} />
+                  <span className="text-sm">{post ? (isLiked ? likeCount : post.likes) : 0}</span>
                 </button>
-                <a
-                  className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
-                  href={`https://www.facebook.com/share.php?u=${encodeURIComponent(window.location.href)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on Facebook"
+                
+                {/* Copy and Social buttons */}
+                <div className="flex items-center justify-between mt-3">
+                  <button
+                    onClick={handleCopy}
+                    className="bg-white rounded-full px-4 py-2 shadow-sm text-sm text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                  >
+                    <Copy />
+                    Copy link
+                  </button>
+                  <div className="flex items-center gap-3">
+                    <a
+                      className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                      href={`https://www.facebook.com/share.php?u=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Share on Facebook"
+                    >
+                      <Facebook />
+                    </a>
+                    <a
+                      className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                      href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Share on LinkedIn"
+                    >
+                      <Linkedin />
+                    </a>
+                    <a
+                      className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                      href={`https://www.twitter.com/share?&url=${encodeURIComponent(window.location.href)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Share on Twitter"
+                    >
+                      <Twitter />
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Desktop Layout */}
+              <div className="hidden lg:flex items-center justify-between">
+                <button 
+                  onClick={handleLike}
+                  className={`flex items-center gap-2 rounded-full px-4 py-2 shadow-sm transition-colors ${
+                    isLiked 
+                      ? 'bg-red-100 text-red-600 hover:bg-red-200' 
+                      : 'bg-white text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
-                  <Facebook />
-                </a>
-                <a
-                  className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
-                  href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on LinkedIn"
-                >
-                  <Linkedin />
-                </a>
-                <a
-                  className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
-                  href={`https://www.twitter.com/share?&url=${encodeURIComponent(window.location.href)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Share on Twitter"
-                >
-                  <Twitter />
-                </a>
+                  <HeartPlus className={isLiked ? 'fill-current' : ''} />
+                  <span className="text-sm">{post ? (isLiked ? likeCount : post.likes) : 0}</span>
+                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={handleCopy}
+                    className="bg-white rounded-full px-4 py-2 shadow-sm text-sm text-gray-700 flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                  >
+                    <Copy />
+                    Copy link
+                  </button>
+                  <a
+                    className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                    href={`https://www.facebook.com/share.php?u=${encodeURIComponent(window.location.href)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share on Facebook"
+                  >
+                    <Facebook />
+                  </a>
+                  <a
+                    className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                    href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share on LinkedIn"
+                  >
+                    <Linkedin />
+                  </a>
+                  <a
+                    className="bg-white rounded-full px-2 py-2 shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-colors"
+                    href={`https://www.twitter.com/share?&url=${encodeURIComponent(window.location.href)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Share on Twitter"
+                  >
+                    <Twitter />
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -246,8 +317,8 @@ export function ViewPostPage() {
           </article>
 
           {/* Aside: Author */}
-          <aside className="lg:col-span-4">
-            <div className="bg-[#EFEEEB] rounded-xl p-6 sticky top-6">
+          <aside className="order-2 lg:w-1/3">
+            <div className="bg-[#EFEEEB] rounded-xl p-6 lg:sticky lg:top-6">
               <div className="flex items-center gap-3">
                 <img
                   src={authorImage}

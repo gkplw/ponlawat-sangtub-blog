@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import { Input } from "../components/ui/input";
+import { Button } from "../components/ui/button";
 import { toast } from "sonner";
-import { NavBar } from "./NavBar";
+import { NavBar } from "../components/layout/NavBar";
 
 export function LoginPage() {
   const [formData, setFormData] = useState({
