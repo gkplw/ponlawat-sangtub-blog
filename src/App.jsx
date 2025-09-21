@@ -1,14 +1,15 @@
-import { NavBar } from "./components/NavBar"
-import { HeroSection } from "./components/HeroSection"
-import { ArticlesFilter } from "./components/ArticleSection"
-import { ViewPostPage } from "./components/ViewPostPage"
-import { Footer } from "./components/Footer"
-import { NotFoundPage } from "./components/NotFoundPage"
-import { SignUpPage } from "./components/SignUpPage"
-import { SignUpSuccessPage } from "./components/SignUpSuccessPage"
-import { LoginPage } from "./components/LoginPage"
-import { ProfilePage } from "./components/ProfilePage"
-import { ResetPasswordPage } from "./components/ResetPasswordPage"
+import { NavBar, Footer, HeroSection, ArticlesFilter } from "./components"
+import { 
+  ViewPostPage,
+  NotFoundPage,
+  SignUpPage,
+  SignUpSuccessPage,
+  LoginPage,
+  ProfilePage,
+  ResetPasswordPage,
+  AdminLoginPage,
+  AdminDashboard
+} from "./pages"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { Toaster } from "sonner"
 
@@ -42,6 +43,8 @@ function App() {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signup-success" element={<SignUpSuccessPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/admin/login" element={<AdminLoginPage />} />
+          <Route path="/admin/*" element={<AdminDashboard />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="*" element={<NotFoundPage />} />

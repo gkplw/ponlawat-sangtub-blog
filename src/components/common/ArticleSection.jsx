@@ -224,8 +224,12 @@ export function ArticlesFilter() {
           {categories.map((c) => (
             <Button
               key={c}
-              variant={c === category ? "secondary" : "ghost"}
-              className="rounded-xl"
+              variant="ghost"
+              className={`rounded-xl transition-colors ${
+                c === category 
+                  ? "bg-[#d4d2cc] text-gray-800 hover:bg-[#DAD6D1] hover:text-gray-800" 
+                  : "text-gray-600 hover:bg-[#DAD6D1] hover:text-gray-800"
+              }`}
               onClick={() => {
                 setPage(1); // reset page
                 setCategory(c);
