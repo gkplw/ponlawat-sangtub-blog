@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, Edit, Trash2, Plus, ChevronDown } from "lucide-react";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
-import { ConfirmationModal } from "../components/common/ConfirmationModal";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
+import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { toast } from "sonner";
 
 export function ArticleManagement() {

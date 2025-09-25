@@ -1,11 +1,9 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
+import { Input } from "../../components/ui/input";
+import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
-import { NavBar } from "../components/layout/NavBar";
 
-export function LoginPage() {
+export function AdminLoginPage() {
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -55,17 +53,22 @@ export function LoginPage() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call with random success/failure
+      // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // Simulate login failure for demonstration
-      const isLoginSuccess = Math.random() > 0.5; // 50% chance of success
+      // Check if credentials match admin credentials
+      const isAdminLogin = formData.email === "admin@example.com" && formData.password === "admin123";
       
-      if (isLoginSuccess) {
-        // Redirect to home page after successful login
-        window.location.href = "/";
+      if (isAdminLogin) {
+        // Redirect to admin dashboard
+        toast.success("Login successful!", {
+          description: "Welcome to admin panel",
+          duration: 3000,
+        });
+        // Redirect to admin dashboard
+        window.location.href = "/admin";
       } else {
-        // Show error notification
+        // Show error notification using sonner toast
         toast.error("Invalid email or password", {
           description: "Please try another password or email",
           duration: 5000,
@@ -82,14 +85,18 @@ export function LoginPage() {
     }
   };
 
+
   return (
     <div className="bg-[#F9F8F6] flex flex-col min-h-screen">
-      <NavBar />
-
       {/* Main Content */}
-      <main className="flex justify-center px-4 mt-6 sm:mt-12 flex-1">
+      <main className="flex justify-center items-center px-4 flex-1">
         <div className="w-full max-w-md">
           <div className="bg-[#efeeeb] rounded-2xl p-6 sm:p-8">
+            {/* Admin Panel Label */}
+            <div className="text-center mb-4">
+              <span className="text-sm text-[#E8A87C] font-medium">Admin panel</span>
+            </div>
+            
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 text-center mb-6 sm:mb-8">
               Log in
             </h1>
@@ -97,7 +104,7 @@ export function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
               {/* Email Field */}
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-800 mb-2">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-600 mb-2">
                   Email
                 </label>
                 <Input
@@ -109,14 +116,11 @@ export function LoginPage() {
                   onChange={handleInputChange}
                   className={`bg-white border-gray-300 ${errors.email ? 'border-red-500' : ''}`}
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-                )}
               </div>
 
               {/* Password Field */}
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-800 mb-2">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-600 mb-2">
                   Password
                 </label>
                 <Input
@@ -128,13 +132,10 @@ export function LoginPage() {
                   onChange={handleInputChange}
                   className={`bg-white border-gray-300 ${errors.password ? 'border-red-500' : ''}`}
                 />
-                {errors.password && (
-                  <p className="text-red-500 text-sm mt-1">{errors.password}</p>
-                )}
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-center">
+              <div className="flex justify-center pt-4">
                 <Button
                   type="submit"
                   disabled={isSubmitting}
@@ -144,19 +145,10 @@ export function LoginPage() {
                 </Button>
               </div>
             </form>
-
-            {/* Footer Link */}
-            <div className="text-center mt-4 sm:mt-6">
-              <p className="text-sm sm:text-base text-gray-600">
-                Don't have any account?{" "}
-                <Link to="/signup" className="text-gray-800 underline hover:text-gray-600">
-                  Sign up
-                </Link>
-              </p>
-            </div>
           </div>
         </div>
       </main>
+
     </div>
   );
 }

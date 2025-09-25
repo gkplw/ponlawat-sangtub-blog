@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu"
-import { Button } from "../ui/button"
 import { Menu, Bell, ChevronDown, User, Lock, LogOut, LogIn, UserPlus } from "lucide-react"
 
 export function NavBar({ variant = "public" }) {

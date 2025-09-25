@@ -1,5 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AdminSidebar } from "../components/layout/AdminSidebar";
+import { AdminSidebar } from "../../components/layout/AdminSidebar";
 import { ArticleManagement } from "./ArticleManagement";
 import { CategoryManagement } from "./CategoryManagement";
 import { AdminProfile } from "./AdminProfile";

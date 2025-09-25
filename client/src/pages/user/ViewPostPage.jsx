@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import authorImage from "../assets/author-image.jpg";
+import authorImage from "@/assets/author-image.jpg";
 import { HeartPlus, Copy, Facebook, Twitter, Linkedin, X } from 'lucide-react';
 import { toast } from "sonner";
 
@@ -278,7 +278,7 @@ export function ViewPostPage() {
               <div className="mt-3 flex justify-end">
                 <button 
                   onClick={handleComment}
-                  className="px-6 py-2 bg-gray-900 text-white rounded-full hover:bg-gray-800 transition-colors"
+                  className="px-6 py-2 bg-[#26231E] text-white rounded-full hover:bg-gray-800 transition-colors"
                 >
                   Send
                 </button>

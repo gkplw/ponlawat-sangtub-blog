@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
+import { Button } from "../../components/ui/button";
+import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
-import authorImage from "../assets/author-image.jpg";
+import authorImage from "@/assets/author-image.jpg";
 
 export function AdminProfile() {
   const [profileData, setProfileData] = useState({
