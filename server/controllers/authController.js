@@ -7,7 +7,7 @@ export const register = async (req, res) => {
   try {
     const { email, password, name, username } = req.body;
 
-    if (!email || !password ) {
+    if (!email || !password) {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
@@ -20,22 +20,50 @@ export const register = async (req, res) => {
       password,
     });
 
-    if (error) throw error;
+    if (error) {
+      // Handle specific Supabase errors
+      if (error.message.includes("User already registered")) {
+        return res.status(409).json({ 
+          error: "Email already exists", 
+          message: "Please use a different email or try logging in."
+        });
+      }
+      if (error.message.includes("Password should be at least")) {
+        return res.status(400).json({ 
+          error: "Weak password", 
+          message: "Password should be at least 6 characters long."
+        });
+      }
+      // Generic error for other cases
+      return res.status(400).json({ 
+        error: "Registration failed", 
+        message: error.message 
+      });
+    }
 
     const userId = data.user.id;
     const { error: insertError } = await supabase
       .from("users")
       .insert([{ id: userId, name, username, role: "user" }]);
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      console.error("Insert error:", insertError);
+      return res.status(500).json({ 
+        error: "Failed to create user profile", 
+        message: "Registration completed but failed to create user profile."
+      });
+    }
 
     return res.status(201).json({
       message: "User registered successfully",
       user: { id: userId, name, username },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ error: "Failed to register user" });
+    console.error("Registration error:", error);
+    return res.status(500).json({ 
+      error: "Failed to register user", 
+      message: "Something went wrong. Please try again later."
+    });
   }
 };
 
@@ -57,7 +85,7 @@ export const login = async (req, res) => {
 
     return res.status(200).json({
       message: "Login successful",
-      session: data.session,
+      access_token: data.session.access_token,
       user: data.user,
     });
   } catch (error) {

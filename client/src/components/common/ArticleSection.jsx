@@ -41,7 +41,7 @@ function BlogCard(props) {
 
 const categories = ["Highlight", "Cat", "Inspiration", "General"];
 
-export function ArticlesFilter() {
+export function ArticleSection() {
   const [category, setCategory] = useState("Highlight");
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);

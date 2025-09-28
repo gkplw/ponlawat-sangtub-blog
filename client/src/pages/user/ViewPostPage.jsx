@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import authorImage from "@/assets/author-image.jpg";
 import { HeartPlus, Copy, Facebook, Twitter, Linkedin, X } from 'lucide-react';
 import { toast } from "sonner";
+import { NavBar } from "../../components/layout/NavBar";
+import { Footer } from "../../components/layout/Footer";
 
 export function ViewPostPage() {
   const [post, setPost] = useState(null);
@@ -98,6 +100,8 @@ export function ViewPostPage() {
   });
 
   return (
+    <>
+      <NavBar />
     <div className="bg-[#F9F8F6] px-4">
       {/* Login Alert Dialog */}
       {showLoginAlert && (
@@ -341,8 +345,10 @@ export function ViewPostPage() {
               </p>
             </div>
           </aside>
-        </div>
-      </main>
-    </div>
+          </div>
+        </main>
+      </div>
+      <Footer />
+    </>
   );
 }

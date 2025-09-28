@@ -3,8 +3,11 @@ import { Link } from "react-router-dom";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { NavBar } from "../../components/layout/NavBar";
+import { useAuth } from "../../context/authentication";
+import { toast } from "sonner";
 
 export function SignUpPage() {
+  const { register } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     username: "",
@@ -63,27 +66,38 @@ export function SignUpPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  
+  if (!validateForm()) {
+    return;
+  }
 
-    setIsSubmitting(true);
+  setIsSubmitting(true);
+  
+  try {
+    const result = await register(formData);
     
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Redirect to success page
+    if (result?.error) {
+      // Show specific error notification
+      toast.error(result.error, {
+        description: result.description || "Please try again",
+        duration: 5000,
+      });
+    } else {
+      // Success case
       window.location.href = "/signup-success";
-    } catch (error) {
-      console.error("Sign up error:", error);
-    } finally {
-      setIsSubmitting(false);
     }
-  };
+  } catch (error) {
+    console.error("Sign up error:", error);
+    toast.error("Sign up failed", {
+      description: "Please try again later",
+      duration: 5000,
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex flex-col">

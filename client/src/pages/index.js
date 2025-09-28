@@ -6,6 +6,7 @@ export { ResetPasswordPage } from './user/ResetPasswordPage';
 export { ProfilePage } from './user/ProfilePage';
 export { ViewPostPage } from './user/ViewPostPage';
 export { NotFoundPage } from './user/NotFoundPage';
+export { HomePage } from './user/HomePage';
 
 // Admin pages
 export { AdminLoginPage } from './admin/AdminLoginPage';

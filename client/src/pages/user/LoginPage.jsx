@@ -4,8 +4,10 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
 import { NavBar } from "../../components/layout/NavBar";
+import { useAuth } from "../../context/authentication";
 
 export function LoginPage() {
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -55,21 +57,22 @@ export function LoginPage() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call with random success/failure
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await login(formData);
       
-      // Simulate login failure for demonstration
-      const isLoginSuccess = Math.random() > 0.5; // 50% chance of success
-      
-      if (isLoginSuccess) {
-        // Redirect to home page after successful login
-        window.location.href = "/";
-      } else {
+      if (result?.error) {
         // Show error notification
         toast.error("Invalid email or password", {
           description: "Please try another password or email",
           duration: 5000,
         });
+      } else {
+        // Show error notification
+        toast.success("Login successful", {
+          description: "Welcome back!",
+          duration: 3000,
+        });
+        // Redirect to home page after successful login
+        window.location.href = "/";
       }
     } catch (error) {
       console.error("Login error:", error);
