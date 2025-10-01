@@ -11,8 +11,36 @@ export const register = async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
+    if (!name || !username) {
+      return res.status(400).json({ error: "Name and username are required" });
+    }
+
     if (!validateEmail(email)) {
       return res.status(400).json({ error: "Email must be a valid email" });
+    }
+
+    // ตรวจสอบว่า username ซ้ำหรือไม่
+    const { data: existingUser, error: checkError } = await supabase
+      .from("users")
+      .select("username")
+      .eq("username", username)
+      .single();
+
+    if (existingUser) {
+      return res.status(409).json({ 
+        error: "Username already exists", 
+        message: "Please choose a different username."
+      });
+    }
+
+    // ถ้า checkError เป็น "PGRST116" แปลว่าไม่มี record ซ้ำ (ปกติ)
+    // ถ้าเป็น error อื่นๆ ให้ return error
+    if (checkError && checkError.code !== "PGRST116") {
+      console.error("Username check error:", checkError);
+      return res.status(500).json({ 
+        error: "Failed to validate username", 
+        message: "Please try again later."
+      });
     }
 
     const { data, error } = await supabase.auth.signUp({
@@ -48,6 +76,22 @@ export const register = async (req, res) => {
 
     if (insertError) {
       console.error("Insert error:", insertError);
+      
+      // ตรวจสอบว่าเป็น error เรื่อง username ซ้ำหรือไม่
+      if (insertError.code === "23505" && insertError.message.includes("username")) {
+        // ลบ user ที่สร้างไปแล้วใน Supabase auth
+        try {
+          await supabase.auth.admin.deleteUser(userId);
+        } catch (deleteError) {
+          console.error("Failed to cleanup user:", deleteError);
+        }
+        
+        return res.status(409).json({ 
+          error: "Username already exists", 
+          message: "Please choose a different username."
+        });
+      }
+      
       return res.status(500).json({ 
         error: "Failed to create user profile", 
         message: "Registration completed but failed to create user profile."
