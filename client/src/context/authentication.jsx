@@ -17,6 +17,7 @@ function AuthProvider(props) {
   // ดึงข้อมูลผู้ใช้โดยใช้ Supabase API
   const fetchUser = async () => {
     const token = localStorage.getItem("token");
+    
     if (!token) {
       setState((prevState) => ({
         ...prevState,
@@ -28,15 +29,37 @@ function AuthProvider(props) {
 
     try {
       setState((prevState) => ({ ...prevState, getUserLoading: true }));
+      
       const response = await axios.get(
-        "http://localhost:4000/auth/user"
+        "http://localhost:4000/auth/user",
+        {
+          headers: {
+            authorization: `Bearer ${token}` // เพิ่ม authorization header
+          }
+        }
       );
+      
+      
       setState((prevState) => ({
         ...prevState,
-        user: response.data,
+        user: response.data.user,
         getUserLoading: false,
       }));
+      
     } catch (error) {
+      console.error("Fetch user error:", error);
+      
+      // ถ้าเป็น 401 error ให้ล้าง token
+      if (error.response?.status === 401) {
+        localStorage.removeItem("token");
+        setState((prevState) => ({
+          ...prevState,
+          user: null,
+          getUserLoading: false,
+        }));
+        return;
+      }
+
       setState((prevState) => ({
         ...prevState,
         error: error.message,
@@ -58,14 +81,23 @@ function AuthProvider(props) {
         "http://localhost:4000/auth/login",
         data
       );
+      
+      
       const token = response.data.access_token;
+      
+      if (!token) {
+        console.error("No access token in response:", response.data);
+        throw new Error("No access token received");
+      }
+      
       localStorage.setItem("token", token);
 
       // ดึงและตั้งค่าข้อมูลผู้ใช้
       setState((prevState) => ({ ...prevState, loading: false, error: null }));
-      navigate("/");
       await fetchUser();
+      navigate("/");
     } catch (error) {
+      console.error("Login error:", error);
       setState((prevState) => ({
         ...prevState,
         loading: false,
@@ -109,12 +141,37 @@ const register = async (data) => {
   }
 };
 
-  // ล็อกเอาท์ผู้ใช้
-  const logout = () => {
+// ล็อกเอาท์ผู้ใช้
+const logout = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    
+    if (token) {
+      // ตรวจสอบ role เพื่อเรียก endpoint ที่ถูกต้อง
+      const logoutEndpoint = state.user?.role === 'admin' 
+        ? "http://localhost:4000/auth/logout-admin"
+        : "http://localhost:4000/auth/logout";
+      
+      await axios.post(
+        logoutEndpoint,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        }
+      );
+    }
+  } catch (error) {
+    console.error("Logout API error:", error);
+    // ถึงแม้ API จะ error ก็ยังต้อง logout ฝั่ง client
+  } finally {
+    // ล้าง token และ state ทุกกรณี
     localStorage.removeItem("token");
-    setState({ user: null, error: null, loading: null });
+    setState({ user: null, error: null, loading: null, getUserLoading: false });
     navigate("/");
-  };
+  }
+};
 
   const isAuthenticated = Boolean(state.user);
 

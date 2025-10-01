@@ -1,20 +1,19 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu"
 import { Menu, Bell, ChevronDown, User, Lock, LogOut, LogIn, UserPlus } from "lucide-react"
+import { useAuth } from "../../context/authentication";
 
-export function NavBar({ variant = "public" }) {
-  const navigate = useNavigate();
+export function NavBar({ variant = "auto" }) {
+  const { isAuthenticated, logout: authLogout } = useAuth();
 
   const handleLogout = () => {
-    // Clear any stored authentication data
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    // Navigate to home page
-    navigate('/');
+    authLogout();
   };
 
+  const actualVariant = variant === "auto" ? (isAuthenticated ? "user" : "public") : variant;
+
   // Public navbar (for login, signup, home pages)
-  if (variant === "public") {
+  if (actualVariant === "public") {
     return (
       <>
         <nav className="flex items-center justify-between py-4 px-4 border-b bg-[#F9F8F6]">

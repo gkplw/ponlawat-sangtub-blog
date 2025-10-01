@@ -71,8 +71,6 @@ export function LoginPage() {
           description: "Welcome back!",
           duration: 3000,
         });
-        // Redirect to home page after successful login
-        window.location.href = "/";
       }
     } catch (error) {
       console.error("Login error:", error);
