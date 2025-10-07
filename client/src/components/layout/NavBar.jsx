@@ -16,7 +16,7 @@ export function NavBar({ variant = "auto" }) {
   if (actualVariant === "public") {
     return (
       <>
-        <nav className="flex items-center justify-between py-4 px-4 border-b bg-[#F9F8F6]">
+        <nav className="flex items-center justify-between py-4 px-4 md:px-10 border-b bg-[#F9F8F6]">
           <Link to="/" className="text-2xl font-bold">
             hh<span className="text-green-500">.</span>
           </Link>

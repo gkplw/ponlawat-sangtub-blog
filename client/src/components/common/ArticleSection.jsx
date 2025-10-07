@@ -141,7 +141,7 @@ export function ArticleSection() {
   };
 
   return (
-    <div className="w-full space-y-2 bg-[#F9F8F6] px-4 py-4">
+    <div className="w-full space-y-2 bg-[#F9F8F6] px-4 md:px-8 py-4">
       <h2 className="text-2xl font-semibold">Latest articles</h2>
 
       {/* Mobile layout */}
