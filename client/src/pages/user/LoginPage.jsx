@@ -159,7 +159,7 @@ export function LoginPage() {
         </div>
       </main>
       {/* Admin Link */}
-      <div className="flex justify-center flex-10">
+      <div className="flex justify-center flex-16">
         <Link to="/admin/login" className="text-blue-600 underline hover:text-blue-300">
           Admin login
         </Link>

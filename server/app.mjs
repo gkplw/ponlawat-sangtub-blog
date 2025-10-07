@@ -16,6 +16,10 @@ async function init() {
   app.use("/posts", postRouter);
   app.use("/auth", authRouter);
 
+  app.get('/', (req, res) => {
+    res.json({ message: 'API is running' });
+  });
+  
   app.listen(port, () => {
     console.log(`Server is running at ${port}`);
   });

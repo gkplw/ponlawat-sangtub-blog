@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { createPost, getPostById, updatePost, deletePost, getAllPosts } from "../controllers/postController.js";
-import { validatePostInput } from "../middlewares/postValidator.js";
+import { createPost, getPostById, updatePost, deletePost, getAllPosts, imageFileUpload } from "../controllers/postController.js";
+import { validatePostInput, validatePostInputWithFile } from "../middlewares/postValidator.js";
 import { protectAdmin } from "../middlewares/authValidator.js";
 
 const postRouter = Router();
 
-postRouter.post("/", validatePostInput, protectAdmin, createPost);
+postRouter.post("/", imageFileUpload, validatePostInputWithFile, protectAdmin, createPost);
 postRouter.get("/:id", getPostById);
 postRouter.put("/:id", validatePostInput, protectAdmin, updatePost);
 postRouter.delete("/:id", protectAdmin, deletePost);

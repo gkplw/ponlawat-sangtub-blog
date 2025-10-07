@@ -1,4 +1,4 @@
-// validation rules
+// validation rules สำหรับการ update (ที่มี image เป็น string/URL)
 export const validatePostInput = (req, res, next) => {
     const { title, image, category_id, description, content, status_id } = req.body;
     if (title === undefined) {
@@ -43,6 +43,49 @@ export const validatePostInput = (req, res, next) => {
         return res.status(400).json({ message: "Status ID must be a number" });
     }
     next();
-};    
+};
+
+// validation rules สำหรับการสร้างโพสต์พร้อมอัปโหลดไฟล์
+export const validatePostInputWithFile = (req, res, next) => {
+    const { title, category_id, description, content, status_id } = req.body;
+    
+    if (title === undefined) {
+        return res.status(400).json({ message: "Title is required" });
+    }
+    if (typeof title !== "string") {
+        return res.status(400).json({ message: "Title must be a string" });
+    }
         
+    if (category_id === undefined) {
+        return res.status(400).json({ message: "Category ID is required" });
+    }
+    // เมื่อส่งผ่าน form-data จะเป็น string ต้องแปลงก่อน
+    if (isNaN(Number(category_id))) {
+        return res.status(400).json({ message: "Category ID must be a number" });
+    }
+        
+    if (description === undefined) {
+        return res.status(400).json({ message: "Description is required" });
+    }
+    if (typeof description !== "string") {
+        return res.status(400).json({ message: "Description must be a string" });
+    }
+        
+    if (content === undefined) {
+        return res.status(400).json({ message: "Content is required" });
+    }
+    if (typeof content !== "string") {
+        return res.status(400).json({ message: "Content must be a string" });
+    }
+        
+    if (status_id === undefined) {
+        return res.status(400).json({ message: "Status ID is required" });
+    }
+    // เมื่อส่งผ่าน form-data จะเป็น string ต้องแปลงก่อน
+    if (isNaN(Number(status_id))) {
+        return res.status(400).json({ message: "Status ID must be a number" });
+    }
+    
+    next();
+};
         
