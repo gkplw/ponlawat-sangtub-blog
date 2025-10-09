@@ -109,8 +109,8 @@ export function ArticleManagement() {
     }
     
     return (
-      <span className={`${baseClasses} bg-blue-100 text-blue-600`}>
-        <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+      <span className={`${baseClasses} bg-green-100 text-green-600`}>
+        <div className="w-2 h-2 bg-green-500 rounded-full"></div>
         <span>{statusName}</span>
       </span>
     );
