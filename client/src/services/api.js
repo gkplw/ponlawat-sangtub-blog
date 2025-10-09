@@ -5,7 +5,7 @@ import jwtInterceptor from "../utils/jwtInterceptor";
 jwtInterceptor();
 
 // Base API URL - server runs on port 4000
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+const API_BASE_URL = "https://ponlawat-sangtub-blog-87r9.vercel.app" || "http://localhost:4000";
 
 // Posts API
 export const postsAPI = {
