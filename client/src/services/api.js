@@ -4,8 +4,8 @@ import jwtInterceptor from "../utils/jwtInterceptor";
 // Initialize JWT interceptor
 jwtInterceptor();
 
-// Base API URL - server runs on port 4000
-const API_BASE_URL = "https://ponlawat-sangtub-blog-87r9.vercel.app" || "http://localhost:4000";
+// Base API URL - ต้องมาเปลี่ยนเป็น url production ทีหลัง
+const API_BASE_URL = "https://ponlawat-sangtub-blog-87r9.vercel.app";
 
 // Posts API
 export const postsAPI = {
