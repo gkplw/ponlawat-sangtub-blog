@@ -1,9 +1,10 @@
 import { Link, useLocation } from "react-router-dom";
 import { FileText, FolderOpen, User, Bell, Lock, ExternalLink, LogOut } from "lucide-react";
+import { useAuth } from "../../context/authentication";
 
 export function AdminSidebar() {
   const location = useLocation();
-
+  const { logout: authLogout } = useAuth();
   const menuItems = [
     {
       icon: FileText,
@@ -33,8 +34,7 @@ export function AdminSidebar() {
   ];
 
   const handleLogout = () => {
-    // In a real app, you would clear authentication tokens here
-    window.location.href = "/";
+    authLogout();
   };
 
   return (
