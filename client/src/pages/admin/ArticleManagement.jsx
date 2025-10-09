@@ -1,71 +1,69 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Search, Edit, Trash2, Plus, ChevronDown } from "lucide-react";
+import { Search, Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { toast } from "sonner";
+import { postsAPI, categoriesAPI, statusesAPI } from "../../services/api";
 
 export function ArticleManagement() {
   const navigate = useNavigate();
-  const [articles, setArticles] = useState([
-    {
-      id: 1,
-      title: "Understanding Cat Behavior: Why Your Feline Friend Acts the Way They Do",
-      category: "Cat",
-      status: "Published"
-    },
-    {
-      id: 2,
-      title: "The Fascinating World of Cats: Why We Love Our Furry Friends",
-      category: "Cat",
-      status: "Published"
-    },
-    {
-      id: 3,
-      title: "Finding Motivation: How to Stay Inspired Through Life's Challenges",
-      category: "General",
-      status: "Published"
-    },
-    {
-      id: 4,
-      title: "The Science of the Cat's Purr: How It Benefits Cats and Humans Alike",
-      category: "Cat",
-      status: "Published"
-    },
-    {
-      id: 5,
-      title: "Top 10 Health Tips to Keep Your Cat Happy and Healthy",
-      category: "Cat",
-      status: "Published"
-    },
-    {
-      id: 6,
-      title: "Unlocking Creativity: Simple Habits to Spark Inspiration Daily",
-      category: "Inspiration",
-      status: "Published"
-    }
-  ]);
-  
+  const [articles, setArticles] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedArticle, setSelectedArticle] = useState(null);
 
-  const categories = ["Cat", "General", "Inspiration"];
+  // Fetch categories and statuses on mount
+  useEffect(() => {
+    async function fetchFilters() {
+      try {
+        const [categoriesRes, statusesRes] = await Promise.all([
+          categoriesAPI.getAll(),
+          statusesAPI.getAll(),
+        ]);
+        setCategories(categoriesRes.data.categories || []);
+        setStatuses(statusesRes.data.statuses || []);
+      } catch (error) {
+        console.error("Error fetching filters:", error);
+      }
+    }
+    fetchFilters();
+  }, []);
 
-  const filteredArticles = articles.filter(article => {
-    const matchesSearch = article.title.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || article.status.toLowerCase() === statusFilter.toLowerCase();
-    const matchesCategory = categoryFilter === "all" || article.category === categoryFilter;
+  // Fetch articles
+  useEffect(() => {
+    async function fetchArticles() {
+      try {
+        setLoading(true);
+        const response = await postsAPI.getAll({
+          ...(searchTerm && { keyword: searchTerm }),
+          ...(categoryFilter !== "all" && { category: categoryFilter }),
+          ...(statusFilter !== "all" && { status: statusFilter }),
+          limit: 100, // Get all for admin
+        });
+        setArticles(response.data.posts || []);
+      } catch (error) {
+        console.error("Error fetching articles:", error);
+        toast.error("Failed to fetch articles");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchArticles();
+  }, [searchTerm, categoryFilter, statusFilter]);
+
+  const handleDeleteArticle = async () => {
+    if (!selectedArticle) return;
     
-    return matchesSearch && matchesStatus && matchesCategory;
-  });
-
-  const handleDeleteArticle = () => {
-    if (selectedArticle) {
+    try {
+      await postsAPI.delete(selectedArticle.id);
       setArticles(articles.filter(article => article.id !== selectedArticle.id));
       setShowDeleteModal(false);
       setSelectedArticle(null);
@@ -74,6 +72,9 @@ export function ArticleManagement() {
         description: "Article has been successfully deleted.",
         duration: 3000,
       });
+    } catch (error) {
+      console.error("Error deleting article:", error);
+      toast.error("Failed to delete article");
     }
   };
 
@@ -86,21 +87,23 @@ export function ArticleManagement() {
     navigate("/admin/articles/create");
   };
 
-  const getStatusBadge = (status) => {
+  const getStatusBadge = (statusId) => {
     const baseClasses = "px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1";
+    const status = statuses.find(s => s.id === statusId);
+    const statusName = status?.status || "Unknown";
     
-    if (status === "Published") {
+    if (statusName.toLowerCase() === "published") {
       return (
         <span className={`${baseClasses} text-green-600`}>
           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span>{status}</span>
+          <span>{statusName}</span>
         </span>
       );
-    } else if (status === "Draft") {
+    } else if (statusName.toLowerCase() === "draft") {
       return (
         <span className={`${baseClasses} bg-gray-100 text-gray-600`}>
           <div className="w-2 h-2 bg-gray-500 rounded-full"></div>
-          <span>{status}</span>
+          <span>{statusName}</span>
         </span>
       );
     }
@@ -108,9 +111,14 @@ export function ArticleManagement() {
     return (
       <span className={`${baseClasses} bg-blue-100 text-blue-600`}>
         <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-        <span>{status}</span>
+        <span>{statusName}</span>
       </span>
     );
+  };
+
+  const getCategoryName = (categoryId) => {
+    const category = categories.find(c => c.id === categoryId);
+    return category?.name || "Unknown";
   };
 
   return (
@@ -150,8 +158,11 @@ export function ArticleManagement() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="published">Published</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
+              {statuses.map(status => (
+                <SelectItem key={status.id} value={status.status.toLowerCase()}>
+                  {status.status}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
@@ -163,7 +174,9 @@ export function ArticleManagement() {
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
               {categories.map(category => (
-                <SelectItem key={category} value={category}>{category}</SelectItem>
+                <SelectItem key={category.id} value={category.name}>
+                  {category.name}
+                </SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -194,54 +207,59 @@ export function ArticleManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-gray-200">
-          {filteredArticles.map((article, index) => (
-            <div 
-              key={article.id} 
-              className={`px-6 py-4 ${
-                index % 2 === 0 ? 'bg-[#F9F8F6]' : 'bg-[#EFEEEB]'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex items-center flex-1">
-                  <div className="flex-1 min-w-0 pr-8">
-                    <h3 className="text-gray-800 font-medium text-sm leading-tight">
-                      {article.title.length > 65
-                        ? `${article.title.substring(0, 65)} ...` 
-                        : article.title
-                      }
-                    </h3>
+          {loading ? (
+            <div className="px-6 py-8 text-center">
+              <Loader2 className="animate-spin w-6 h-6 mx-auto text-gray-600" />
+              <p className="mt-2 text-gray-500">Loading articles...</p>
+            </div>
+          ) : articles.length > 0 ? (
+            articles.map((article, index) => (
+              <div 
+                key={article.id} 
+                className={`px-6 py-4 ${
+                  index % 2 === 0 ? 'bg-[#F9F8F6]' : 'bg-[#EFEEEB]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center flex-1">
+                    <div className="flex-1 min-w-0 pr-8">
+                      <h3 className="text-gray-800 font-medium text-sm leading-tight">
+                        {article.title.length > 65
+                          ? `${article.title.substring(0, 65)} ...` 
+                          : article.title
+                        }
+                      </h3>
+                    </div>
+                    <div className="w-32 mr-8">
+                      <span className="text-gray-600 text-sm">{getCategoryName(article.category_id)}</span>
+                    </div>
+                    <div className="w-32 mr-16">
+                      {getStatusBadge(article.status_id)}
+                    </div>
                   </div>
-                  <div className="w-32 mr-8">
-                    <span className="text-gray-600 text-sm">{article.category}</span>
+                  <div className="w-20 flex items-center justify-end space-x-2">
+                    <button 
+                      onClick={() => navigate(`/admin/articles/edit/${article.id}`)}
+                      className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    >
+                      <Edit className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => openDeleteModal(article)}
+                      className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
                   </div>
-                  <div className="w-32 mr-16">
-                    {getStatusBadge(article.status)}
-                  </div>
-                </div>
-                <div className="w-20 flex items-center justify-end space-x-2">
-                  <button 
-                    onClick={() => navigate(`/admin/articles/edit/${article.id}`)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                  >
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => openDeleteModal(article)}
-                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="px-6 py-8 text-center text-gray-500">
+              No articles found
             </div>
-          ))}
+          )}
         </div>
-
-        {filteredArticles.length === 0 && (
-          <div className="px-6 py-8 text-center text-gray-500">
-            No articles found
-          </div>
-        )}
       </div>
 
       {/* Delete Confirmation Modal */}

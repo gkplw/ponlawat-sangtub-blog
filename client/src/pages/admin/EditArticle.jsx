@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
@@ -6,44 +6,64 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { toast } from "sonner";
 import { Image, Trash2 } from "lucide-react";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
-import authorImage from "@/assets/author-image.jpg";
+import { postsAPI, categoriesAPI, statusesAPI } from "../../services/api";
 
 export function EditArticle() {
   const navigate = useNavigate();
   const { id } = useParams();
+  const fileInputRef = useRef(null);
   
   const [articleData, setArticleData] = useState({
     title: "",
-    category: "",
-    authorName: "Thompson P.",
-    introduction: "",
+    category_id: "",
+    description: "",
     content: "",
-    thumbnailImage: null
+    image: "",
+    status_id: "",
   });
 
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState([]);
+  const [statuses, setStatuses] = useState([]);
 
-  const categories = ["Cat", "General", "Inspiration"];
-
-  // Mock data for demonstration - in real app, fetch from API
+  // Fetch categories, statuses, and article data
   useEffect(() => {
-    // Simulate fetching article data
-    const mockArticles = {
-      1: {
-        title: "The Fascinating World of Cats: Why We Love Our Furry Friends",
-        category: "Cat",
-        authorName: "Thompson P.",
-        introduction: "Cats have captivated human hearts for thousands of years. Whether lounging in a sunny spot or playfully chasing a string, these furry companions bring warmth and joy to millions of homes. But what makes cats so special? Let's dive into the unique traits, behaviors, and quirks that make cats endlessly fascinating.",
-        content: "1. Independent Yet Affectionate\n\nOne of the most remarkable traits of cats is their balance between independence and affection. Unlike dogs, who are often eager for constant attention, cats enjoy their alone time. They can spend hours grooming themselves, exploring the house, or napping in quiet corners. However, when they want affection, they know how to seek it out with a soft purr, a gentle nuzzle, or by curling up on your lap.\n\nThis quality makes cats appealing to many people who appreciate the fact that their feline companions are low-maintenance but still loving. It's like having a roommate who enjoys your company but doesn't demand too much of your time!\n\n2. Playful Personalities\n\nCats are naturally curious and playful. From kittens to adults, they enjoy engaging with toys, climbing furniture, or chasing after imaginary prey. Their play often mimics hunting behavior, which is a nod to their wild ancestors. Whether they're pouncing on a feather or chasing across the room after a laser pointer, their agility and energy are mesmerizing to watch.\n\nThis playfulness also serves as mental stimulation for cats. Providing toys and opportunities to climb or explore helps them stay active and reduces boredom, which is important for indoor cats.\n\n3. Communication Through Body Language\n\nCats are master communicators, though they do so in subtle ways. Understanding a cat's body language can deepen the bond between you and your pet. Here are some common signals:\n\nPurring: Usually a sign of contentment, though cats may also purr when anxious or in pain.",
-        thumbnailImage: authorImage
+    async function fetchData() {
+      try {
+        setLoading(true);
+        const [categoriesRes, statusesRes, articleRes] = await Promise.all([
+          categoriesAPI.getAll(),
+          statusesAPI.getAll(),
+          postsAPI.getById(id),
+        ]);
+        
+        setCategories(categoriesRes.data.categories || []);
+        setStatuses(statusesRes.data.statuses || []);
+        
+        const article = articleRes.data;
+        setArticleData({
+          title: article.title || "",
+          category_id: article.category_id || "",
+          description: article.description || "",
+          content: article.content || "",
+          image: article.image || "",
+          status_id: article.status_id || "",
+        });
+        setImagePreview(article.image);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to load article data");
+        navigate("/admin/articles");
+      } finally {
+        setLoading(false);
       }
-    };
-
-    if (mockArticles[id]) {
-      setArticleData(mockArticles[id]);
     }
-  }, [id]);
+    fetchData();
+  }, [id, navigate]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -56,58 +76,78 @@ export function EditArticle() {
   const handleCategoryChange = (value) => {
     setArticleData(prev => ({
       ...prev,
-      category: value
+      category_id: value
     }));
   };
 
   const handleImageUpload = () => {
-    // In a real app, this would open file picker
-    toast.info("Upload feature", {
-      description: "Image upload functionality would be implemented here",
-      duration: 3000,
-    });
+    fileInputRef.current?.click();
   };
 
-  const handleSaveAsDraft = async () => {
-    setIsSubmitting(true);
-    
-    try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error("Please select an image file");
+        return;
+      }
       
-      toast.success("Create article and saved as draft", {
-        description: "You can publish article later",
-        duration: 3000,
-      });
-    } catch (error) {
-      console.error("Save draft error:", error);
-      toast.error("Save failed", {
-        description: "Please try again later",
-        duration: 5000,
-      });
-    } finally {
-      setIsSubmitting(false);
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size should be less than 5MB");
+        return;
+      }
+
+      setImageFile(file);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  const handleSaveAndPublish = async () => {
+  const handleSave = async () => {
+    if (!articleData.title.trim()) {
+      toast.error("Please enter article title");
+      return;
+    }
+    if (!articleData.category_id) {
+      toast.error("Please select a category");
+      return;
+    }
+    if (!articleData.description.trim()) {
+      toast.error("Please enter article description");
+      return;
+    }
+    if (!articleData.content.trim()) {
+      toast.error("Please enter article content");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Update article data (without image for now)
+      await postsAPI.update(id, {
+        title: articleData.title,
+        image: articleData.image, // Keep existing image URL
+        category_id: parseInt(articleData.category_id),
+        description: articleData.description,
+        content: articleData.content,
+        status_id: parseInt(articleData.status_id),
+      });
       
-      toast.success("Create article and published", {
-        description: "Your article has been successfully published",
+      toast.success("Article updated", {
+        description: "Your article has been successfully updated",
         duration: 3000,
       });
       
-      // Navigate back to articles list
       navigate("/admin/articles");
     } catch (error) {
-      console.error("Publish error:", error);
-      toast.error("Publish failed", {
-        description: "Please try again later",
+      console.error("Update error:", error);
+      toast.error("Failed to update article", {
+        description: error.response?.data?.message || "Please try again later",
         duration: 5000,
       });
     } finally {
@@ -119,14 +159,28 @@ export function EditArticle() {
     setShowDeleteModal(true);
   };
 
-  const handleDeleteArticle = () => {
-    setShowDeleteModal(false);
-    toast.success("Article deleted", {
-      description: "Article has been removed",
-      duration: 3000,
-    });
-    navigate("/admin/articles");
+  const handleDeleteArticle = async () => {
+    try {
+      await postsAPI.delete(id);
+      setShowDeleteModal(false);
+      toast.success("Article deleted", {
+        description: "Article has been removed",
+        duration: 3000,
+      });
+      navigate("/admin/articles");
+    } catch (error) {
+      console.error("Delete error:", error);
+      toast.error("Failed to delete article");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Loading article...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#F9F8F6] min-h-screen flex">
@@ -134,22 +188,14 @@ export function EditArticle() {
       <div className="flex-1 p-6">
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">Create article</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Edit article</h1>
           <div className="flex items-center space-x-3">
             <Button
-              onClick={handleSaveAsDraft}
-              disabled={isSubmitting}
-              variant="outline"
-              className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50"
-            >
-              {isSubmitting ? "Saving..." : "Save as draft"}
-            </Button>
-            <Button
-              onClick={handleSaveAndPublish}
+              onClick={handleSave}
               disabled={isSubmitting}
               className="px-8 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
             >
-              {isSubmitting ? "Publishing..." : "Save"}
+              {isSubmitting ? "Saving..." : "Save"}
             </Button>
           </div>
         </div>
@@ -162,12 +208,19 @@ export function EditArticle() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Thumbnail image
               </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
               <div className="flex items-center space-x-4">
-                <div className="w-100 h-60 bg-[#EFEEEB] rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
-                  {articleData.thumbnailImage ? (
+                <div className="w-100 h-60 bg-[#EFEEEB] rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden">
+                  {imagePreview ? (
                     <img 
-                      src={articleData.thumbnailImage} 
-                      alt="Thumbnail" 
+                      src={imagePreview} 
+                      alt="Thumbnail Preview" 
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
@@ -175,6 +228,7 @@ export function EditArticle() {
                       <div className="w-8 h-8 mx-auto mb-2 text-gray-400">
                         <Image />
                       </div>
+                      <p className="text-sm text-gray-500">No image</p>
                     </div>
                   )}
                 </div>
@@ -184,7 +238,7 @@ export function EditArticle() {
                   variant="outline"
                   className="px-6 py-2 border border-gray-300 rounded-full hover:bg-gray-50"
                 >
-                  Upload thumbnail image
+                  Change thumbnail image
                 </Button>
               </div>
             </div>
@@ -194,32 +248,18 @@ export function EditArticle() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
               </label>
-              <Select value={articleData.category} onValueChange={handleCategoryChange}>
+              <Select value={articleData.category_id?.toString()} onValueChange={handleCategoryChange}>
                 <SelectTrigger className="w-100 bg-white">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map(category => (
-                    <SelectItem key={category} value={category}>{category}</SelectItem>
+                    <SelectItem key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
-
-            {/* Author Name */}
-            <div>
-              <label htmlFor="authorName" className="block text-sm font-medium text-gray-700 mb-2">
-                Author name
-              </label>
-              <Input
-                id="authorName"
-                name="authorName"
-                type="text"
-                value={articleData.authorName}
-                onChange={handleInputChange}
-                className="w-100 bg-[#EFEEEB] border-gray-300"
-                readOnly
-              />
             </div>
 
             {/* Title */}
@@ -238,23 +278,23 @@ export function EditArticle() {
               />
             </div>
 
-            {/* Introduction */}
+            {/* Description */}
             <div>
-              <label htmlFor="introduction" className="block text-sm font-medium text-gray-700 mb-2">
-                Introduction (max 120 letters)
+              <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
+                Description (max 200 characters)
               </label>
               <textarea
-                id="introduction"
-                name="introduction"
+                id="description"
+                name="description"
                 rows={4}
-                placeholder="Introduction"
-                value={articleData.introduction}
+                placeholder="Brief description of the article"
+                value={articleData.description}
                 onChange={handleInputChange}
-                maxLength={120}
+                maxLength={200}
                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md"
               />
               <div className="text-right text-sm text-gray-500 mt-1">
-                {articleData.introduction.length}/120 characters
+                {articleData.description.length}/200 characters
               </div>
             </div>
 
@@ -267,7 +307,7 @@ export function EditArticle() {
                 id="content"
                 name="content"
                 rows={12}
-                placeholder="Content"
+                placeholder="Article content (supports Markdown)"
                 value={articleData.content}
                 onChange={handleInputChange}
                 className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md"

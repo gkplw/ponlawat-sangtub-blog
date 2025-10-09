@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "../ui/button";
 import { Loader2, Search } from "lucide-react";
 import authorImage from "../../assets/author-image.jpg";
-import axios from "axios";
+import { postsAPI, categoriesAPI } from "../../services/api";
 
 function BlogCard(props) {
   const { id, image, category, title, description, author, date } = props;
@@ -39,9 +39,8 @@ function BlogCard(props) {
   );
 }
 
-const categories = ["Highlight", "Cat", "Inspiration", "General"];
-
 export function ArticleSection() {
+  const [categories, setCategories] = useState([]);
   const [category, setCategory] = useState("Highlight");
   const [search, setSearch] = useState("");
   const [data, setData] = useState([]);
@@ -54,21 +53,31 @@ export function ArticleSection() {
   const [searchLoading, setSearchLoading] = useState(false);
   const searchRef = useRef(null);
 
+  // Fetch categories on mount
+  useEffect(() => {
+    async function fetchCategories() {
+      try {
+        const response = await categoriesAPI.getAll();
+        const categoryNames = response.data.categories.map(cat => cat.name);
+        setCategories(["Highlight", ...categoryNames]);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        setCategories(["Highlight"]);
+      }
+    }
+    fetchCategories();
+  }, []);
+
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true);
-        const response = await axios.get(
-          `https://blog-post-project-api.vercel.app/posts`,
-          {
-            params: {
-              page,
-              limit: 6,
-              ...(category !== "Highlight" && { category }),
-              ...(search && { keyword: search }),
-            }
-          }
-        );
+        const response = await postsAPI.getAll({
+          page,
+          limit: 6,
+          ...(category !== "Highlight" && { category }),
+          ...(search && { keyword: search }),
+        });
 
         if (page === 1) {
           setData(response.data.posts); // reset ข้อมูล
@@ -79,6 +88,7 @@ export function ArticleSection() {
         setTotalPages(response.data.totalPages);
         setErrorMessage(null);
       } catch (error) {
+        console.error("Error fetching posts:", error);
         setErrorMessage("Unable to load data. Please try again.");
       } finally {
         setLoading(false);
@@ -112,15 +122,10 @@ export function ArticleSection() {
 
     try {
       setSearchLoading(true);
-      const response = await axios.get(
-        `https://blog-post-project-api.vercel.app/posts`,
-        {
-          params: {
-            keyword: searchTerm,
-            limit: 6, // จำกัดผลลัพธ์ให้แสดงแค่ 6 รายการ
-          }
-        }
-      );
+      const response = await postsAPI.getAll({
+        keyword: searchTerm,
+        limit: 6, // จำกัดผลลัพธ์ให้แสดงแค่ 6 รายการ
+      });
       setSearchResults(response.data.posts);
       setShowSearchDropdown(true);
     } catch (error) {

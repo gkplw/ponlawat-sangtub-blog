@@ -1,48 +1,74 @@
-import { useState } from "react";
-import { Search, Edit, Trash2, Plus, X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Search, Edit, Trash2, Plus, X, Loader2 } from "lucide-react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { toast } from "sonner";
+import { categoriesAPI } from "../../services/api";
 
 export function CategoryManagement() {
-  const [categories, setCategories] = useState([
-    { id: 1, name: "Cat" },
-    { id: 2, name: "General" },
-    { id: 3, name: "Inspiration" }
-  ]);
-  
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [editingCategory, setEditingCategory] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  // Fetch categories
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  const fetchCategories = async () => {
+    try {
+      setLoading(true);
+      const response = await categoriesAPI.getAll();
+      setCategories(response.data.categories || []);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+      toast.error("Failed to fetch categories");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredCategories = categories.filter(category =>
     category.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleCreateCategory = () => {
-    if (!newCategoryName.trim()) return;
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) {
+      toast.error("Please enter category name");
+      return;
+    }
     
-    const newCategory = {
-      id: Date.now(),
-      name: newCategoryName.trim()
-    };
-    
-    setCategories([...categories, newCategory]);
-    setNewCategoryName("");
-    setShowCreateModal(false);
-    
-    toast.success("Create category", {
-      description: "Category has been successfully created.",
-      duration: 3000,
-    });
+    setSubmitting(true);
+    try {
+      const response = await categoriesAPI.create({ name: newCategoryName.trim() });
+      setCategories([...categories, response.data.category]);
+      setNewCategoryName("");
+      setShowCreateModal(false);
+      
+      toast.success("Create category", {
+        description: "Category has been successfully created.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error creating category:", error);
+      toast.error(error.response?.data?.message || "Failed to create category");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleDeleteCategory = () => {
-    if (selectedCategory) {
+  const handleDeleteCategory = async () => {
+    if (!selectedCategory) return;
+    
+    try {
+      await categoriesAPI.delete(selectedCategory.id);
       setCategories(categories.filter(cat => cat.id !== selectedCategory.id));
       setShowDeleteModal(false);
       setSelectedCategory(null);
@@ -51,6 +77,9 @@ export function CategoryManagement() {
         description: "Category has been successfully deleted.",
         duration: 3000,
       });
+    } catch (error) {
+      console.error("Error deleting category:", error);
+      toast.error(error.response?.data?.message || "Failed to delete category");
     }
   };
 
@@ -60,23 +89,38 @@ export function CategoryManagement() {
     setShowCreateModal(true);
   };
 
-  const handleUpdateCategory = () => {
-    if (!newCategoryName.trim() || !editingCategory) return;
+  const handleUpdateCategory = async () => {
+    if (!newCategoryName.trim() || !editingCategory) {
+      toast.error("Please enter category name");
+      return;
+    }
     
-    setCategories(categories.map(cat => 
-      cat.id === editingCategory.id 
-        ? { ...cat, name: newCategoryName.trim() }
-        : cat
-    ));
-    
-    setNewCategoryName("");
-    setShowCreateModal(false);
-    setEditingCategory(null);
-    
-    toast.success("Update category", {
-      description: "Category has been successfully updated.",
-      duration: 3000,
-    });
+    setSubmitting(true);
+    try {
+      const response = await categoriesAPI.update(editingCategory.id, { 
+        name: newCategoryName.trim() 
+      });
+      
+      setCategories(categories.map(cat => 
+        cat.id === editingCategory.id 
+          ? response.data.category
+          : cat
+      ));
+      
+      setNewCategoryName("");
+      setShowCreateModal(false);
+      setEditingCategory(null);
+      
+      toast.success("Update category", {
+        description: "Category has been successfully updated.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error updating category:", error);
+      toast.error(error.response?.data?.message || "Failed to update category");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const openDeleteModal = (category) => {
@@ -135,37 +179,42 @@ export function CategoryManagement() {
 
         {/* Table Body */}
         <div className="divide-y divide-gray-200">
-          {filteredCategories.map((category, index) => (
-            <div 
-              key={category.id} 
-              className={`px-6 py-4 flex items-center justify-between ${
-                index % 2 === 0 ? 'bg-[#F9F8F6]' : 'bg-[#EFEEEB]'
-              }`}
-              >
-              <span className="text-gray-800 font-medium text-sm leading-tight">{category.name}</span>
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => handleEditCategory(category)}
-                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => openDeleteModal(category)}
-                  className="p-2 text-gray-400 hover:text-red-500 transition-colors"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
+          {loading ? (
+            <div className="px-6 py-8 text-center">
+              <Loader2 className="animate-spin w-6 h-6 mx-auto text-gray-600" />
+              <p className="mt-2 text-gray-500">Loading categories...</p>
             </div>
-          ))}
+          ) : filteredCategories.length > 0 ? (
+            filteredCategories.map((category, index) => (
+              <div 
+                key={category.id} 
+                className={`px-6 py-4 flex items-center justify-between ${
+                  index % 2 === 0 ? 'bg-[#F9F8F6]' : 'bg-[#EFEEEB]'
+                }`}
+              >
+                <span className="text-gray-800 font-medium text-sm leading-tight">{category.name}</span>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => handleEditCategory(category)}
+                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => openDeleteModal(category)}
+                    className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="px-6 py-8 text-center text-gray-500">
+              No categories found
+            </div>
+          )}
         </div>
-
-        {filteredCategories.length === 0 && (
-          <div className="px-6 py-8 text-center text-gray-500">
-            No categories found
-          </div>
-        )}
       </div>
 
       {/* Create/Edit Category Modal */}
@@ -203,9 +252,10 @@ export function CategoryManagement() {
               <div className="flex space-x-3 justify-center">
                 <Button
                   onClick={editingCategory ? handleUpdateCategory : handleCreateCategory}
-                  className="px-6 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
+                  disabled={submitting}
+                  className="px-6 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors disabled:opacity-50"
                 >
-                  Save
+                  {submitting ? "Saving..." : "Save"}
                 </Button>
               </div>
             </div>

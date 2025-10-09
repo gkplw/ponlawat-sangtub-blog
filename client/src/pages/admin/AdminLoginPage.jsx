@@ -2,8 +2,10 @@ import { useState } from "react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "../../context/authentication";
 
 export function AdminLoginPage() {
+  const { loginAdmin } = useAuth();
   const [formData, setFormData] = useState({
     email: "",
     password: ""
@@ -53,25 +55,19 @@ export function AdminLoginPage() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await loginAdmin(formData);
       
-      // Check if credentials match admin credentials
-      const isAdminLogin = formData.email === "admin@example.com" && formData.password === "admin123";
-      
-      if (isAdminLogin) {
-        // Redirect to admin dashboard
+      if (result?.error) {
+        // Show error notification
+        toast.error("Invalid email or password", {
+          description: "Please check your credentials and try again",
+          duration: 5000,
+        });
+      } else {
+        // Success - loginAdmin will handle navigation
         toast.success("Login successful!", {
           description: "Welcome to admin panel",
           duration: 3000,
-        });
-        // Redirect to admin dashboard
-        window.location.href = "/admin";
-      } else {
-        // Show error notification using sonner toast
-        toast.error("Invalid email or password", {
-          description: "Please try another password or email",
-          duration: 5000,
         });
       }
     } catch (error) {

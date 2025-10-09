@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
 import authorImage from "@/assets/author-image.jpg";
@@ -7,53 +6,119 @@ import { HeartPlus, Copy, Facebook, Twitter, Linkedin, X } from 'lucide-react';
 import { toast } from "sonner";
 import { NavBar } from "../../components/layout/NavBar";
 import { Footer } from "../../components/layout/Footer";
+import { postsAPI, commentsAPI, likesAPI } from "../../services/api";
+import { useAuth } from "../../context/authentication";
 
 export function ViewPostPage() {
   const [post, setPost] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [newComment, setNewComment] = useState("");
   const [errorMessage, setErrorMessage] = useState(null);
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
   const [showLoginAlert, setShowLoginAlert] = useState(false);
-  const [isLoggedIn] = useState(false); // สมมติว่าผู้ใช้ทุกคนยังไม่ได้เข้าสู่ระบบ
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [submittingComment, setSubmittingComment] = useState(false);
   const params = useParams();
   const navigate = useNavigate();
+  const { isAuthenticated, state } = useAuth();
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get(
-          `https://blog-post-project-api.vercel.app/posts/${params.postId}`
-        );
+        const response = await postsAPI.getById(params.postId);
         setPost(response.data);
+        setLikeCount(response.data.likes_count || 0);
         setErrorMessage(null);
       } catch (error) {
+        console.error("Error fetching post:", error);
         setErrorMessage("Unable to load data. Please try again.");
       }
     }
     fetchData();
   }, [params.postId]);
 
-  const handleLike = () => {
-    if (!isLoggedIn) {
+  // Fetch comments
+  useEffect(() => {
+    async function fetchComments() {
+      try {
+        setLoadingComments(true);
+        const response = await commentsAPI.getByPostId(params.postId);
+        setComments(response.data.comments || []);
+      } catch (error) {
+        console.error("Error fetching comments:", error);
+      } finally {
+        setLoadingComments(false);
+      }
+    }
+    if (params.postId) {
+      fetchComments();
+    }
+  }, [params.postId]);
+
+  // Check if user liked the post
+  useEffect(() => {
+    async function checkLike() {
+      if (!isAuthenticated) return;
+      try {
+        const response = await likesAPI.checkUserLike(params.postId);
+        setIsLiked(response.data.isLiked);
+      } catch (error) {
+        console.error("Error checking like:", error);
+      }
+    }
+    if (params.postId && isAuthenticated) {
+      checkLike();
+    }
+  }, [params.postId, isAuthenticated]);
+
+  const handleLike = async () => {
+    if (!isAuthenticated) {
       setShowLoginAlert(true);
       return;
     }
     
-    if (isLiked) {
-      setLikeCount(post.likes);
-      setIsLiked(false);
-    } else {
-      setLikeCount(post.likes + 1);
-      setIsLiked(true);
+    try {
+      const response = await likesAPI.toggle(params.postId);
+      setIsLiked(response.data.isLiked);
+      setLikeCount(response.data.likes_count);
+      
+      toast.success(response.data.isLiked ? "Liked!" : "Unliked", {
+        description: response.data.isLiked ? "Added to your favorites" : "Removed from your favorites",
+      });
+    } catch (error) {
+      console.error("Error toggling like:", error);
+      toast.error("Failed to update like");
     }
   };
 
-  const handleComment = () => {
-    if (!isLoggedIn) {
+  const handleComment = async () => {
+    if (!isAuthenticated) {
       setShowLoginAlert(true);
       return;
     }
-    // TODO: Handle comment submission
+    
+    if (!newComment.trim()) {
+      toast.error("Please enter a comment");
+      return;
+    }
+    
+    try {
+      setSubmittingComment(true);
+      const response = await commentsAPI.create({
+        post_id: params.postId,
+        comment_text: newComment,
+      });
+      
+      setComments([response.data.comment, ...comments]);
+      setNewComment("");
+      toast.success("Comment posted successfully!");
+    } catch (error) {
+      console.error("Error posting comment:", error);
+      toast.error("Failed to post comment");
+    } finally {
+      setSubmittingComment(false);
+    }
   };
 
   const handleCopy = async () => {
@@ -231,7 +296,7 @@ export function ViewPostPage() {
                   }`}
                 >
                   <HeartPlus className={isLiked ? 'fill-current' : ''} />
-                  <span className="text-sm">{post ? (isLiked ? likeCount : post.likes) : 0}</span>
+                  <span className="text-sm">{likeCount}</span>
                 </button>
                 <div className="flex items-center gap-3">
                   <button
@@ -276,47 +341,49 @@ export function ViewPostPage() {
             <div className="mt-10">
               <label className="block mb-2 text-sm font-medium">Comment</label>
               <textarea
+                value={newComment}
+                onChange={(e) => setNewComment(e.target.value)}
                 className="w-full h-28 rounded-lg border p-3 focus:outline-none focus:ring-2 bg-white focus:ring-gray-400"
                 placeholder="What are your thoughts?"
+                disabled={submittingComment}
               ></textarea>
               <div className="mt-3 flex justify-end">
                 <button 
                   onClick={handleComment}
-                  className="px-6 py-2 bg-[#26231E] text-white rounded-full hover:bg-gray-800 transition-colors"
+                  disabled={submittingComment}
+                  className="px-6 py-2 bg-[#26231E] text-white rounded-full hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send
+                  {submittingComment ? "Sending..." : "Send"}
                 </button>
               </div>
             </div>
 
-            {/* Example comments */}
+            {/* Comments */}
             <div className="mt-8 space-y-6">
-              <div className="border-b border-gray-300 pb-6">
-                <p className="font-semibold">Jacob Lash</p>
-                <p className="text-xs text-gray-500">12 September 2024 at 18:30</p>
-                <p className="mt-1 text-gray-700">
-                  I loved this article! It really explains why my cat is so
-                  independent yet loving. The purring section was super
-                  interesting.
-                </p>
-              </div>
-              <div className="border-b border-gray-300 pb-6">
-                <p className="font-semibold">Ahri</p>
-                <p className="text-xs text-gray-500">12 September 2024 at 18:30</p>
-                <p className="mt-1 text-gray-700">
-                  Such a great read! I've always wondered why my cat slow blinks
-                  at me—now I know it's her way of showing trust!
-                </p>
-              </div>
-              <div className="pb-6">
-                <p className="font-semibold">Mimi mama</p>
-                <p className="text-xs text-gray-500">12 September 2024 at 18:30</p>
-                <p className="mt-1 text-gray-700">
-                  This article perfectly captures why cats make such amazing pets.
-                  I had no idea their purring could help with healing.
-                  Fascinating stuff!
-                </p>
-              </div>
+              {loadingComments ? (
+                <p className="text-center text-gray-500">Loading comments...</p>
+              ) : comments.length > 0 ? (
+                comments.map((comment, index) => (
+                  <div 
+                    key={comment.id} 
+                    className={`pb-6 ${index !== comments.length - 1 ? 'border-b border-gray-300' : ''}`}
+                  >
+                    <p className="font-semibold">{comment.users?.name || comment.users?.username || "Anonymous"}</p>
+                    <p className="text-xs text-gray-500">
+                      {new Date(comment.created_at).toLocaleDateString("en-GB", {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit"
+                      })}
+                    </p>
+                    <p className="mt-1 text-gray-700">{comment.comment_text}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-500">No comments yet. Be the first to comment!</p>
+              )}
             </div>
           </article>
 
