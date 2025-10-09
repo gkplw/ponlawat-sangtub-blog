@@ -1,5 +1,43 @@
 import { supabase } from "../utils/supabase.js";
 
+// Authenticate - ตรวจสอบ token และดึงข้อมูล user พร้อม role (ไม่เช็ค role)
+export const authenticate = async (req, res, next) => {
+    const token = req.headers.authorization?.split(" ")[1];
+  
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized: Token missing" });
+    }
+  
+    try {
+      // ดึงข้อมูลผู้ใช้จาก token
+      const { data, error } = await supabase.auth.getUser(token);
+  
+      if (error || !data.user) {
+        return res.status(401).json({ error: "Unauthorized: Invalid token" });
+      }
+  
+      const supabaseUserId = data.user.id;
+  
+      // ดึงข้อมูล role และข้อมูลอื่นๆ จาก users table
+      const { data: userData, error: dbError } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", supabaseUserId)
+        .single();
+  
+      if (dbError || !userData) {
+        return res.status(404).json({ error: "User not found" });
+      }
+  
+      // แนบข้อมูลผู้ใช้พร้อม role เข้ากับ request object
+      req.user = { ...data.user, ...userData };
+  
+      next();
+    } catch (err) {
+      return res.status(500).json({ error: "Internal server error" });
+    }
+};
+
 // Protect user
 export const protectUser = async (req, res, next) => {
     const token = req.headers.authorization?.split(" ")[1]; // ดึง token จาก Authorization header
@@ -20,13 +58,9 @@ export const protectUser = async (req, res, next) => {
       const supabaseUserId = data.user.id;
   
       // ดึงข้อมูล role ของผู้ใช้จากฐานข้อมูล PostgreSQL
-      const values = [supabaseUserId];
       const { data: userData, error: dbError } = await supabase.from("users").select("role").eq("id", supabaseUserId).single();
   
-      if (error || !userData) {
-        return res.status(404).json({ error: "User role not found" });
-      }
-      if (dbError) {
+      if (dbError || !userData) {
         return res.status(404).json({ error: "User role not found" });
       }
   
@@ -67,13 +101,9 @@ export const protectAdmin = async (req, res, next) => {
       const supabaseUserId = data.user.id;
   
       // ดึงข้อมูล role ของผู้ใช้จากฐานข้อมูล PostgreSQL
-      const values = [supabaseUserId];
       const { data: userData, error: dbError } = await supabase.from("users").select("role").eq("id", supabaseUserId).single();
   
-      if (error || !userData) {
-        return res.status(404).json({ error: "User role not found" });
-      }
-      if (dbError) {
+      if (dbError || !userData) {
         return res.status(404).json({ error: "User role not found" });
       }
   

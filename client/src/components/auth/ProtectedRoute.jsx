@@ -20,8 +20,9 @@ function ProtectedRoute({
   }
 
   if (!isAuthenticated || userRole !== requiredRole) {
-    // คืนค่า null ขณะที่ Navigate ทำการเปลี่ยนเส้นทาง
-    return <Navigate to="/login" replace />;
+    // Redirect ไปหน้า login ตาม role ที่ต้องการ
+    const redirectPath = requiredRole === "admin" ? "/admin/login" : "/login";
+    return <Navigate to={redirectPath} replace />;
   }
 
   // ผู้ใช้มีการยืนยันตัวตนและมีบทบาทที่ถูกต้อง

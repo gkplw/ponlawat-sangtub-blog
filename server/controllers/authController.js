@@ -248,10 +248,21 @@ export const loginAdmin = async (req, res) => {
       });
   
       if (error) return res.status(401).json({ error: "Invalid credentials" });
+
+      // ตรวจสอบว่าเป็น admin หรือไม่
+      const { data: userData, error: userError } = await supabase
+        .from("users")
+        .select("role")
+        .eq("id", data.user.id)
+        .single();
+
+      if (userError || !userData || userData.role !== "admin") {
+        return res.status(403).json({ error: "Access denied. Admin only." });
+      }
   
       return res.status(200).json({
-        message: "Login successful",
-        session: data.session,
+        message: "Admin login successful",
+        access_token: data.session.access_token,
         user: data.user,
       });
     } catch (error) {

@@ -60,7 +60,7 @@ export function AdminLoginPage() {
       if (result?.error) {
         // Show error notification
         toast.error("Invalid email or password", {
-          description: "Please check your credentials and try again",
+          description: result.error || "Please check your credentials and try again",
           duration: 5000,
         });
       } else {
@@ -73,7 +73,7 @@ export function AdminLoginPage() {
     } catch (error) {
       console.error("Login error:", error);
       toast.error("Login failed", {
-        description: "Please try again later",
+        description: error.message || "Please try again later",
         duration: 5000,
       });
     } finally {

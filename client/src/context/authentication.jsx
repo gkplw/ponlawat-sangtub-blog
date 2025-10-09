@@ -80,9 +80,12 @@ function AuthProvider(props) {
       
       localStorage.setItem("token", token);
 
-      // ดึงและตั้งค่าข้อมูลผู้ใช้
-      setState((prevState) => ({ ...prevState, loading: false, error: null }));
+      // ดึงและตั้งค่าข้อมูลผู้ใช้ (รอให้เสร็จก่อน navigate)
       await fetchUser();
+      
+      setState((prevState) => ({ ...prevState, loading: false, error: null }));
+      
+      // Navigate หลังจาก fetchUser เสร็จแล้ว
       navigate("/");
     } catch (error) {
       console.error("Login error:", error);
@@ -110,18 +113,22 @@ function AuthProvider(props) {
       
       localStorage.setItem("token", token);
 
-      // ดึงและตั้งค่าข้อมูล admin
-      setState((prevState) => ({ ...prevState, loading: false, error: null }));
+      // ดึงและตั้งค่าข้อมูล admin (รอให้เสร็จก่อน navigate)
       await fetchUser();
+      
+      setState((prevState) => ({ ...prevState, loading: false, error: null }));
+      
+      // Navigate หลังจาก fetchUser เสร็จแล้ว
       navigate("/admin");
     } catch (error) {
       console.error("Admin login error:", error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Login failed";
       setState((prevState) => ({
         ...prevState,
         loading: false,
-        error: error.response?.data?.error || "Login failed",
+        error: errorMessage,
       }));
-      return { error: error.response?.data?.error || "Login failed" };
+      return { error: errorMessage };
     }
   };
 
