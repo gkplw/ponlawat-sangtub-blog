@@ -88,7 +88,13 @@ export const getPostById = async (req, res) => {
 
     const { data, error } = await supabase
       .from("posts")
-      .select("*")
+      .select(`
+        *,
+        categories:category_id (
+          id,
+          name
+        )
+      `)
       .eq("id", id)
       .single();
 
@@ -99,7 +105,13 @@ export const getPostById = async (req, res) => {
       throw error;
     }
 
-    return res.status(200).json(data);
+    // แปลง categories object เป็น category string
+    const post = {
+      ...data,
+      category: data.categories?.name || "Uncategorized"
+    };
+
+    return res.status(200).json(post);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Server could not read post because database connection" });
@@ -169,13 +181,35 @@ export const getAllPosts = async (req, res) => {
     const limit = parseInt(req.query.limit) || 6;
     const category = req.query.category;
     const keyword = req.query.keyword;
+    const status = req.query.status;
 
     const offset = (page - 1) * limit;
 
-    let query = supabase.from("posts").select("*", { count: "exact" });
+    let query = supabase.from("posts").select(`
+      *,
+      categories:category_id (
+        id,
+        name
+      )
+    `, { count: "exact" });
 
     if (category) {
-      query = query.eq("category_id", category);
+      // ถ้า category เป็น number (category_id) ให้ใช้ตรงๆ
+      // ถ้า category เป็น string (category name) ให้หา category_id ก่อน
+      if (!isNaN(category)) {
+        query = query.eq("category_id", parseInt(category));
+      } else {
+        // หา category_id จาก category name
+        const { data: categoryData } = await supabase
+          .from("categories")
+          .select("id")
+          .eq("name", category)
+          .single();
+        
+        if (categoryData) {
+          query = query.eq("category_id", categoryData.id);
+        }
+      }
     }
 
     if (keyword) {
@@ -184,11 +218,27 @@ export const getAllPosts = async (req, res) => {
       );
     }
 
+    if (status) {
+      // แปลง status string เป็น lowercase และหา status_id
+      const statusLower = status.toLowerCase();
+      if (statusLower === "published") {
+        query = query.eq("status_id", 2);
+      } else if (statusLower === "draft") {
+        query = query.eq("status_id", 1);
+      }
+    }
+
     const { data: posts, count, error } = await query
       .order("id", { ascending: true })
       .range(offset, offset + limit - 1);
 
     if (error) throw error;
+
+    // แปลง categories object เป็น category string
+    const postsWithCategory = posts.map(post => ({
+      ...post,
+      category: post.categories?.name || "Uncategorized"
+    }));
 
     const totalPages = Math.ceil(count / limit);
 
@@ -197,7 +247,7 @@ export const getAllPosts = async (req, res) => {
       totalPages,
       currentPage: page,
       limit,
-      posts,
+      posts: postsWithCategory,
       nextPage: page < totalPages ? page + 1 : null,
     });
   } catch (error) {
