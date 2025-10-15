@@ -4,8 +4,9 @@ import jwtInterceptor from "../utils/jwtInterceptor";
 // Initialize JWT interceptor
 jwtInterceptor();
 
-// Base API URL - ต้องมาเปลี่ยนเป็น url production ทีหลัง
-const API_BASE_URL = "http://localhost:4000" || "https://ponlawat-sangtub-blog-87r9.vercel.app/";
+// Base API URL - resolves for both development and production
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? (import.meta.env.PROD ? window.location.origin : "http://localhost:4000");
 
 // Posts API
 export const postsAPI = {
