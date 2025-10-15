@@ -4,13 +4,14 @@ import { Menu, Bell, ChevronDown, User, Lock, LogOut, LogIn, UserPlus } from "lu
 import { useAuth } from "../../context/authentication";
 
 export function NavBar({ variant = "auto" }) {
-  const { isAuthenticated, logout: authLogout } = useAuth();
+  const { isAuthenticated, logout: authLogout, state } = useAuth();
 
   const handleLogout = () => {
     authLogout();
   };
 
   const actualVariant = variant === "auto" ? (isAuthenticated ? "user" : "public") : variant;
+  const user = state?.user || {};
 
   // Public navbar (for login, signup, home pages)
   if (actualVariant === "public") {
@@ -76,7 +77,7 @@ export function NavBar({ variant = "auto" }) {
         {/* Desktop - Right side - Notifications and Profile */}
         <div className="hidden md:flex items-center space-x-4">
           {/* Notification Bell */}
-          <button className="p-2 text-gray-600 hover:text-gray-800 transition-colors">
+          <button className="text-gray-600 hover:text-gray-800 transition-colors">
             <Bell className="w-5 h-5" />
           </button>
 
@@ -85,16 +86,16 @@ export function NavBar({ variant = "auto" }) {
             <DropdownMenuTrigger asChild>
               <button className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
                 {/* Profile Picture */}
-                <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden">
+                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&h=100&fit=crop&crop=face" 
-                    alt="Profile" 
+                    src={user.profile_pic} 
+                    alt={user.username || user.name || "Profile"}
                     className="w-full h-full object-cover"
                   />
                 </div>
 
                 {/* Username */}
-                <span className="text-gray-800 font-medium">Moodeng ja</span>
+                <span className="p-2 text-gray-800 font-medium">{user.username || user.name || "User"}</span>
 
                 {/* Dropdown Arrow */}
                 <ChevronDown className="w-4 h-4 text-gray-600" />
