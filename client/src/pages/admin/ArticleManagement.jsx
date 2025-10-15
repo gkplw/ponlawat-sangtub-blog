@@ -210,7 +210,7 @@ export function ArticleManagement() {
           {loading ? (
             <div className="mt-10 flex flex-col items-center">
               <Loader2 className="w-16 h-16 animate-spin text-foreground" />
-              <p className="mt-4 text-lg font-semibold">Loading...</p>
+              <p className="mt-4 mb-4 text-lg font-semibold">Loading...</p>
             </div>
           ) : articles.length > 0 ? (
             articles.map((article, index) => (

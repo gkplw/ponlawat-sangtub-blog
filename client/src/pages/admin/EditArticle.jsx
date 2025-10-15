@@ -4,10 +4,9 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 import { toast } from "sonner";
-import { Image, Trash2 } from "lucide-react";
+import { Image, Trash2, Loader2 } from "lucide-react";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { postsAPI, categoriesAPI, statusesAPI } from "../../services/api";
-import { LoadingScreen } from "../../components/common/LoadingScreen";
 
 export function EditArticle() {
   const navigate = useNavigate();
@@ -177,7 +176,10 @@ export function EditArticle() {
 
   if (loading) {
     return (
-      <LoadingScreen />
+      <div className="mt-64 flex flex-col items-center">
+        <Loader2 className="w-16 h-16 animate-spin text-foreground" />
+      <p className="mt-4 mb-4 text-lg font-semibold">Loading...</p>
+      </div>
     );
   }
 
