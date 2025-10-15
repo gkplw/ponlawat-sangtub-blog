@@ -23,7 +23,7 @@ export function BlogCard(props) {
             {description}
           </p>
           <div className="flex items-center text-sm">
-            <img className="w-8 h-8 rounded-full mr-2" src={authorImage} alt={author} />
+            <img className="w-12 h-12 rounded-full mr-2" src={authorImage} alt={author} />
             <span>{author}</span>
             <span className="mx-2 text-gray-300">|</span>
             <span>{date}</span>

@@ -84,12 +84,12 @@ export function NavBar({ variant = "auto" }) {
           {/* Profile Section with Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex items-center space-x-3 hover:bg-gray-50 rounded-lg px-2 py-1 transition-colors">
+              <button className="flex items-center space-x-3 px-2 py-1">
                 {/* Profile Picture */}
                 <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
                   <img 
                     src={user.profile_pic} 
-                    alt={user.username || user.name || "Profile"}
+                    alt={user.username || user.name}
                     className="w-full h-full object-cover"
                   />
                 </div>

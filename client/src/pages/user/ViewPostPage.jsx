@@ -241,7 +241,7 @@ export function ViewPostPage() {
                   }`}
                 >
                   <HeartPlus className={isLiked ? 'fill-current' : ''} />
-                  <span className="text-sm">{post ? (isLiked ? likeCount : post.likes) : 0}</span>
+                  <span className="text-sm">{likeCount}</span>
                 </button>
                 
                 {/* Copy and Social buttons */}
@@ -368,17 +368,26 @@ export function ViewPostPage() {
                     key={comment.id} 
                     className={`pb-6 ${index !== comments.length - 1 ? 'border-b border-gray-300' : ''}`}
                   >
-                    <p className="font-semibold">{comment.users?.name || comment.users?.username || "Anonymous"}</p>
-                    <p className="text-xs text-gray-500">
-                      {new Date(comment.created_at).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit"
-                      })}
-                    </p>
-                    <p className="mt-1 text-gray-700">{comment.comment_text}</p>
+                    <div className="flex items-start gap-3">
+                      <img
+                        src={comment.users?.profile_pic}
+                        alt={comment.users?.name || comment.users?.username || "User"}
+                        className="w-12 h-12 rounded-full bg-gray-200 object-cover"
+                      />
+                      <div className="flex-1">
+                        <p className="font-semibold">{comment.users?.name || comment.users?.username || "Anonymous"}</p>
+                        <p className="text-xs text-gray-500">
+                          {new Date(comment.created_at).toLocaleDateString("en-GB", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit"
+                          })}
+                        </p>
+                        <p className="mt-1 text-gray-700">{comment.comment_text}</p>
+                      </div>
+                    </div>
                   </div>
                 ))
               ) : (
@@ -390,7 +399,7 @@ export function ViewPostPage() {
           {/* Aside: Author */}
           <aside className="order-2 lg:w-1/3">
             <div className="bg-[#EFEEEB] rounded-xl p-6 lg:sticky lg:top-6">
-              <div className="flex items-center gap-3">
+              <div className="border-b border-gray-300 pb-3 mb-3 flex items-center gap-3">
                 <img
                   src={authorImage}
                   alt={post.author}
@@ -398,7 +407,7 @@ export function ViewPostPage() {
                 />
                 <div>
                   <p className="text-xs text-gray-500">Author</p>
-                  <p className="font-semibold">{post.author}</p>
+                  <p className="font-semibold">Author name</p>
                 </div>
               </div>
               <p className="text-sm text-gray-600 mt-4">
