@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Image, Trash2 } from "lucide-react";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { postsAPI, categoriesAPI, statusesAPI } from "../../services/api";
+import { LoadingScreen } from "../../components/common/LoadingScreen";
 
 export function EditArticle() {
   const navigate = useNavigate();
@@ -176,9 +177,7 @@ export function EditArticle() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p>Loading article...</p>
-      </div>
+      <LoadingScreen />
     );
   }
 

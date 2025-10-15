@@ -8,6 +8,7 @@ import { NavBar } from "../../components/layout/NavBar";
 import { Footer } from "../../components/layout/Footer";
 import { postsAPI, commentsAPI, likesAPI } from "../../services/api";
 import { useAuth } from "../../context/authentication";
+import { LoadingScreen } from "../../components/common/LoadingScreen";
 
 export function ViewPostPage() {
   const [post, setPost] = useState(null);
@@ -19,6 +20,7 @@ export function ViewPostPage() {
   const [showLoginAlert, setShowLoginAlert] = useState(false);
   const [loadingComments, setLoadingComments] = useState(false);
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [loadingPost, setLoadingPost] = useState(true);
   const params = useParams();
   const navigate = useNavigate();
   const { isAuthenticated, state } = useAuth();
@@ -26,6 +28,7 @@ export function ViewPostPage() {
   useEffect(() => {
     async function fetchData() {
       try {
+        setLoadingPost(true);
         const response = await postsAPI.getById(params.postId);
         setPost(response.data);
         setLikeCount(response.data.likes_count || 0);
@@ -33,6 +36,8 @@ export function ViewPostPage() {
       } catch (error) {
         console.error("Error fetching post:", error);
         setErrorMessage("Unable to load data. Please try again.");
+      } finally {
+        setLoadingPost(false);
       }
     }
     fetchData();
@@ -150,11 +155,13 @@ export function ViewPostPage() {
     );
   }
 
-  if (!post) {
+  if (!post || loadingPost) {
     return (
-      <p className="container px-4 py-8 text-center text-gray-500">
-        Loading...
-      </p>
+      <div className="flex flex-col min-h-screen">
+        <div className="min-h-screen md:p-8">
+          <LoadingScreen />
+        </div>
+      </div>
     );
   }
 
@@ -376,7 +383,7 @@ export function ViewPostPage() {
                       />
                       <div className="flex-1">
                         <p className="font-semibold">{comment.users?.name || comment.users?.username || "Anonymous"}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="mt-1 text-xs text-gray-500">
                           {new Date(comment.created_at).toLocaleDateString("en-GB", {
                             day: "numeric",
                             month: "long",
@@ -385,9 +392,9 @@ export function ViewPostPage() {
                             minute: "2-digit"
                           })}
                         </p>
-                        <p className="mt-1 text-gray-700">{comment.comment_text}</p>
                       </div>
                     </div>
+                    <p className="mt-4 text-gray-700">{comment.comment_text}</p>
                   </div>
                 ))
               ) : (

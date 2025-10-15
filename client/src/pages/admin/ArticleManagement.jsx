@@ -208,9 +208,9 @@ export function ArticleManagement() {
         {/* Table Body */}
         <div className="divide-y divide-gray-200">
           {loading ? (
-            <div className="px-6 py-8 text-center">
-              <Loader2 className="animate-spin w-6 h-6 mx-auto text-gray-600" />
-              <p className="mt-2 text-gray-500">Loading articles...</p>
+            <div className="mt-10 flex flex-col items-center">
+              <Loader2 className="w-16 h-16 animate-spin text-foreground" />
+              <p className="mt-4 text-lg font-semibold">Loading...</p>
             </div>
           ) : articles.length > 0 ? (
             articles.map((article, index) => (

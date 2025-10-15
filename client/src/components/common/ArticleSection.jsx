@@ -296,8 +296,9 @@ export function ArticleSection() {
 
       {/* Loading Spinner */}
       {loading && (
-        <div className="flex justify-center mt-4">
-          <Loader2 className="animate-spin w-6 h-6 text-gray-600" />
+        <div className="flex flex-col items-center">
+          <Loader2 className="w-16 h-16 animate-spin text-foreground" />
+          <p className="mt-4 text-lg font-semibold">Loading...</p>
         </div>
       )}
 
