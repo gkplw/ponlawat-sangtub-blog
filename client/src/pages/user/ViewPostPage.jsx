@@ -378,11 +378,11 @@ export function ViewPostPage() {
                     <div className="flex items-start gap-3">
                       <img
                         src={comment.users?.profile_pic}
-                        alt={comment.users?.name || comment.users?.username || "User"}
+                        alt={comment.users?.username}
                         className="w-12 h-12 rounded-full bg-gray-200 object-cover"
                       />
                       <div className="flex-1">
-                        <p className="font-semibold">{comment.users?.name || comment.users?.username || "Anonymous"}</p>
+                        <p className="font-semibold">{comment.users?.username}</p>
                         <p className="mt-1 text-xs text-gray-500">
                           {new Date(comment.created_at).toLocaleDateString("en-GB", {
                             day: "numeric",
