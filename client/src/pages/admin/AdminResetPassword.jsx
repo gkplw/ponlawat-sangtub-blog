@@ -3,8 +3,13 @@ import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { toast } from "sonner";
+import { useAuth } from "../../context/authentication";
+import { authAPI } from "../../services/api";
 
 export function AdminResetPassword() {
+  const { state } = useAuth();
+  const user = state?.user || {};
+  
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -69,8 +74,10 @@ export function AdminResetPassword() {
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authAPI.resetPasswordAdmin({
+        oldPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
       
       // Reset form
       setFormData({
@@ -78,6 +85,7 @@ export function AdminResetPassword() {
         newPassword: "",
         confirmPassword: ""
       });
+      setErrors({});
       
       toast.success("Password reset successfully", {
         description: "Your password has been updated",
@@ -85,7 +93,8 @@ export function AdminResetPassword() {
       });
     } catch (error) {
       console.error("Password reset error:", error);
-      toast.error("Password reset failed", {
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Password reset failed";
+      toast.error(errorMessage, {
         description: "Please try again later",
         duration: 5000,
       });

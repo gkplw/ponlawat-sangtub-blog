@@ -5,8 +5,13 @@ import { NavBar } from "../../components/layout/NavBar";
 import { UserSidebar } from "../../components/layout/UserSidebar";
 import { ConfirmationModal } from "../../components/common/ConfirmationModal";
 import { toast } from "sonner";
+import { useAuth } from "../../context/authentication";
+import { authAPI } from "../../services/api";
 
 export function ResetPasswordPage() {
+  const { state } = useAuth();
+  const user = state?.user || {};
+  
   const [formData, setFormData] = useState({
     currentPassword: "",
     newPassword: "",
@@ -68,8 +73,10 @@ export function ResetPasswordPage() {
     setShowModal(false);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authAPI.resetPassword({
+        oldPassword: formData.currentPassword,
+        newPassword: formData.newPassword
+      });
       
       // Show success notification
       toast.success("Password reset successfully", {
@@ -86,7 +93,8 @@ export function ResetPasswordPage() {
       setErrors({});
     } catch (error) {
       console.error("Reset error:", error);
-      toast.error("Failed to reset password");
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to reset password";
+      toast.error(errorMessage);
     } finally {
       setIsResetting(false);
     }
@@ -100,14 +108,14 @@ export function ResetPasswordPage() {
       <main className="flex-1 p-4 sm:p-6 min-h-0">
         <div className="max-w-6xl mx-auto">
           <div className="hidden sm:flex items-center mb-4 sm:mb-6">
-            <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-3">
+            <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-3">
               <img 
-                src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&h=100&fit=crop&crop=face" 
-                alt="Profile" 
+                src={user.profile_pic} 
+                alt={user.name || user.username} 
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-xl sm:text-2xl font-bold text-[#75716B]">Moodeng ja</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#75716B]">{user.username}</span>
             <span className="text-xl sm:text-2xl text-gray-400 mx-3">|</span>
             <span className="text-xl sm:text-2xl font-bold text-[#26231E]">Reset password</span>
           </div>
