@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { NavBar } from "../../components/layout/NavBar";
@@ -18,6 +18,8 @@ export function ProfilePage() {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
 
   // Load user data when component mounts
   useEffect(() => {
@@ -64,6 +66,34 @@ export function ProfilePage() {
     }
   };
 
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      await authAPI.uploadProfilePicture(file);
+      await fetchUser();
+      toast.success("Uploaded profile picture", {
+        description: "Your profile picture has been updated",
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to upload";
+      toast.error(errorMessage);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F9F8F6] flex flex-col">
       <NavBar variant="user" />
@@ -95,7 +125,7 @@ export function ProfilePage() {
               <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8 max-w-lg">
               {/* Profile Picture Section */}
               <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
-                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
+                <div className="w-16 h-16 rounded-full bg-gray-200 overflow-hidden">
                   <img 
                     src={user.profile_pic} 
                     alt={user.name || user.username} 
@@ -105,9 +135,18 @@ export function ProfilePage() {
                 <Button
                   variant="outline"
                   className="px-4 sm:px-6 py-2 rounded-full border-gray-300 text-gray-800 hover:bg-gray-50 text-sm sm:text-base"
+                  onClick={handleUploadClick}
+                  disabled={isUploading}
                 >
-                  Upload profile picture
+                  {isUploading ? "Uploading..." : "Upload profile picture"}
                 </Button>
+                <input
+                  type="file"
+                  accept="image/*"
+                  ref={fileInputRef}
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
               </div>
 
               {/* Form Fields */}

@@ -1,4 +1,5 @@
 import { supabase } from "../utils/supabase.js";
+import multer from "multer";
 import validateEmail from "../utils/validateEmail.js";
 
 //User Controller
@@ -217,6 +218,66 @@ export const updateProfile = async (req, res) => {
       error: "Failed to update profile", 
       message: "Please try again later." 
     });
+  }
+};
+
+// Upload user profile picture
+export const profilePictureUpload = multer({ storage: multer.memoryStorage() }).single("file");
+
+export const uploadProfilePicture = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const file = req.file;
+    const fileExt = file.originalname.split('.').pop();
+    const filePath = `profiles/${userId}/${Date.now()}_${file.originalname}`;
+
+    // Upload to Supabase storage bucket
+    const bucketName = "personal-blog";
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true,
+      });
+
+    if (uploadError) {
+      console.error("Upload error:", uploadError);
+      return res.status(500).json({ error: "Failed to upload image" });
+    }
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(uploadData.path);
+
+    const publicUrl = publicUrlData.publicUrl;
+
+    // Save profile_pic to users table
+    const { data: updatedUser, error: updateError } = await supabase
+      .from("users")
+      .update({ profile_pic: publicUrl })
+      .eq("id", userId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error("DB update error:", updateError);
+      return res.status(500).json({ error: "Failed to save profile picture" });
+    }
+
+    return res.status(200).json({
+      message: "Profile picture uploaded successfully",
+      profile_pic: publicUrl,
+      user: { ...req.user, ...updatedUser },
+    });
+  } catch (error) {
+    console.error("uploadProfilePicture error:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
 

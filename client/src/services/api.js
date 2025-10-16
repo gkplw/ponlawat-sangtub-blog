@@ -142,6 +142,14 @@ export const authAPI = {
     return axios.put(`${API_BASE_URL}/auth/user/profile`, data);
   },
 
+  uploadProfilePicture: async (file) => {
+    const form = new FormData();
+    form.append("file", file);
+    return axios.post(`${API_BASE_URL}/auth/user/profile-picture`, form, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  },
+
   getAdmin: async () => {
     return axios.get(`${API_BASE_URL}/auth/admin`);
   },
