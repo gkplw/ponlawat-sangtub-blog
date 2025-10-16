@@ -138,6 +138,10 @@ export const authAPI = {
     return axios.get(`${API_BASE_URL}/auth/user`);
   },
 
+  updateProfile: async (data) => {
+    return axios.put(`${API_BASE_URL}/auth/user/profile`, data);
+  },
+
   getAdmin: async () => {
     return axios.get(`${API_BASE_URL}/auth/admin`);
   },

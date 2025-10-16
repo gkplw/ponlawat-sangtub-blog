@@ -1,18 +1,34 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { NavBar } from "../../components/layout/NavBar";
 import { UserSidebar } from "../../components/layout/UserSidebar";
 import { toast } from "sonner";
+import { useAuth } from "../../context/authentication";
+import { authAPI } from "../../services/api";
 
 export function ProfilePage() {
+  const { state, fetchUser } = useAuth();
+  const user = state?.user || {};
+  
   const [formData, setFormData] = useState({
-    name: "Moodeng ja",
-    username: "moodeng.cute",
-    email: "moodeng.cute@gmail.com"
+    name: "",
+    username: "",
+    email: ""
   });
 
   const [isSaving, setIsSaving] = useState(false);
+
+  // Load user data when component mounts
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        username: user.username || "",
+        email: user.email || ""
+      });
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -26,8 +42,13 @@ export function ProfilePage() {
     setIsSaving(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await authAPI.updateProfile({
+        name: formData.name,
+        username: formData.username
+      });
+      
+      // Refresh user data
+      await fetchUser();
       
       // Show success notification
       toast.success("Saved profile", {
@@ -36,7 +57,8 @@ export function ProfilePage() {
       });
     } catch (error) {
       console.error("Save error:", error);
-      toast.error("Failed to save profile");
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to save profile";
+      toast.error(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -50,14 +72,14 @@ export function ProfilePage() {
       <main className="flex-1 p-4 sm:p-6 min-h-0">
         <div className="max-w-6xl mx-auto">
           <div className="hidden sm:flex items-center mb-4 sm:mb-6">
-            <div className="w-8 h-8 rounded-full bg-gray-200 overflow-hidden mr-3">
+            <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden mr-3">
               <img 
-                src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&h=100&fit=crop&crop=face" 
-                alt="Profile" 
+                src={user.profile_pic} 
+                alt={user.name || user.username} 
                 className="w-full h-full object-cover"
               />
             </div>
-            <span className="text-xl sm:text-2xl font-bold text-[#75716B]">Moodeng ja</span>
+            <span className="text-xl sm:text-2xl font-bold text-[#75716B]">{user.username}</span>
             <span className="text-xl sm:text-2xl text-gray-400 mx-3">|</span>
             <span className="text-xl sm:text-2xl font-bold text-[#26231E]">Profile</span>
           </div>
@@ -73,10 +95,10 @@ export function ProfilePage() {
               <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8 max-w-lg">
               {/* Profile Picture Section */}
               <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gray-200 overflow-hidden">
+                <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
                   <img 
-                    src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&h=100&fit=crop&crop=face" 
-                    alt="Profile" 
+                    src={user.profile_pic} 
+                    alt={user.name || user.username} 
                     className="w-full h-full object-cover"
                   />
                 </div>

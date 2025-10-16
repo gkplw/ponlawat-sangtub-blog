@@ -151,6 +151,75 @@ export const getUser = async (req, res) => {
   }
 };
 
+// Update user profile
+export const updateProfile = async (req, res) => {
+  try {
+    const { name, username } = req.body;
+    const userId = req.user.id;
+
+    if (!name && !username) {
+      return res.status(400).json({ error: "At least one field (name or username) is required" });
+    }
+
+    // Check if username is already taken by another user
+    if (username) {
+      const { data: existingUser, error: checkError } = await supabase
+        .from("users")
+        .select("id")
+        .eq("username", username)
+        .neq("id", userId)
+        .single();
+
+      if (existingUser) {
+        return res.status(409).json({ 
+          error: "Username already exists", 
+          message: "Please choose a different username." 
+        });
+      }
+
+      if (checkError && checkError.code !== "PGRST116") {
+        console.error("Username check error:", checkError);
+        return res.status(500).json({ 
+          error: "Failed to validate username", 
+          message: "Please try again later." 
+        });
+      }
+    }
+
+    // Prepare update data
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (username) updateData.username = username;
+
+    // Update user profile
+    const { data, error } = await supabase
+      .from("users")
+      .update(updateData)
+      .eq("id", userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update profile error:", error);
+      return res.status(500).json({ 
+        error: "Failed to update profile", 
+        message: "Please try again later." 
+      });
+    }
+
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user: { ...req.user, ...data },
+    });
+  } catch (error) {
+    console.error("Error in updateProfile:", error);
+    return res.status(500).json({ 
+      error: "Failed to update profile", 
+      message: "Please try again later." 
+    });
+  }
+};
+
 // Reset Password user
 export const resetPassword = async (req, res) => {
     const token = req.headers.authorization?.split(" ")[1]; // ดึง token จาก Authorization header

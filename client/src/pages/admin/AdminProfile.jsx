@@ -138,6 +138,7 @@ export function AdminProfile() {
               value={profileData.email}
               onChange={handleInputChange}
               className="w-100 bg-white border-gray-300"
+              disabled
             />
           </div>
 
