@@ -9,13 +9,13 @@ export function Footer() {
           <div className="flex items-center gap-6 text-gray-700">
             <span className="text-base font-medium">Get in touch</span>
             <div className="flex items-center gap-4">
-              <a href="#" aria-label="LinkedIn" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
+              <a href="https://www.linkedin.com/in/ponlawat-sangtub-970433286" aria-label="LinkedIn" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
                 <Linkedin />
               </a>
-              <a href="#" aria-label="GitHub" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
+              <a href="https://github.com/gkplw" aria-label="GitHub" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
                 <Github />
               </a>
-              <a href="#" aria-label="Mail" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
+              <a href="mailto:p.sangtub@gmail.com" aria-label="Mail" className="w-9 h-9 rounded-full bg-[#43403B] text-white grid place-items-center hover:opacity-80 transition">
                 <Mail />
               </a>
             </div>
