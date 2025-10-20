@@ -223,11 +223,11 @@ export function ViewPostPage() {
           <span className="text-gray-400 text-sm">{formattedDate}</span>
         </div>
 
-        <h1 className="text-3xl lg:text-5xl font-bold leading-tight mb-6">
+        <h1 className="text-3xl lg:text-5xl font-bold leading-tight">
           {post.title}
         </h1>
 
-        <div className="flex flex-col lg:flex-row gap-10">
+        <div className="flex flex-col lg:flex-row gap-4 lg:gap-10">
           {/* Content */}
           <article className="order-1 lg:flex-1 lg:w-2/3">
             <section className="markdown text-gray-700">
@@ -404,7 +404,7 @@ export function ViewPostPage() {
           </article>
 
           {/* Aside: Author */}
-          <aside className="order-2 lg:w-1/3">
+          <aside className="order-1 lg:w-1/3">
               <AsideAuthor />
           </aside>
           </div>

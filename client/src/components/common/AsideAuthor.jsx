@@ -28,7 +28,7 @@ export function AsideAuthor() {
       }, []);
 
     return (
-        <div className="bg-[#EFEEEB] rounded-xl p-6 lg:sticky lg:top-6">
+        <div className="bg-[#EFEEEB] rounded-xl p-8 lg:sticky lg:top-6">
         <div className="border-b border-gray-300 pb-3 mb-3 flex items-center gap-3">
           <img
             src={authorData.profile_pic}
