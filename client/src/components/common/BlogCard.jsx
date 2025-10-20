@@ -46,7 +46,7 @@ export function BlogCard(props) {
             </h2>
           </Link>
           <p className="text-muted-foreground text-sm mb-4 flex-grow line-clamp-3">
-            {description}
+            {description.length > 110 ? description.slice(0, 110) + " ..." : description}
           </p>
           <div className="flex items-center text-sm">
             <img className="w-12 h-12 rounded-full object-cover mr-2" src={authorData.profile_pic} alt={authorData.name} />
