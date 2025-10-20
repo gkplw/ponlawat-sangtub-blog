@@ -35,7 +35,7 @@ export function AdminSidebar() {
   return (
     <div className="w-64 bg-[#efeeeb] min-h-screen p-4 flex flex-col">
       {/* Header */}
-      <div className="mb-8">
+      <div className="p-3 mb-8">
         <Link to="/" className="text-2xl font-bold">
           hh<span className="text-green-500">.</span>
         </Link>
