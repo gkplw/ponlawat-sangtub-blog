@@ -145,7 +145,7 @@ export function AdminProfile() {
           {/* Bio */}
           <div>
             <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
-              Bio (max 120 letters)
+              Bio (max 300 letters)
             </label>
             <textarea
               id="bio"
@@ -153,11 +153,11 @@ export function AdminProfile() {
               rows={6}
               value={profileData.bio}
               onChange={handleInputChange}
-              maxLength={120}
+              maxLength={300}
               className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md"
             />
             <div className="text-right text-sm text-gray-500 mt-1">
-              {profileData.bio.length}/120 characters
+              {profileData.bio.length}/300 characters
             </div>
           </div>
         </form>

@@ -3,6 +3,7 @@ import { Input } from "../../components/ui/input";
 import { Button } from "../../components/ui/button";
 import { toast } from "sonner";
 import { useAuth } from "../../context/authentication";
+import { NavBar } from "../../components/layout/NavBar";
 
 export function AdminLoginPage() {
   const { loginAdmin } = useAuth();
@@ -84,8 +85,9 @@ export function AdminLoginPage() {
 
   return (
     <div className="bg-[#F9F8F6] flex flex-col min-h-screen">
+      <NavBar />
       {/* Main Content */}
-      <main className="flex justify-center items-center px-4 flex-1">
+      <main className="flex justify-center px-4 mt-12 flex-1">
         <div className="w-full max-w-md">
           <div className="bg-[#efeeeb] rounded-2xl p-6 sm:p-8">
             {/* Admin Panel Label */}
@@ -144,7 +146,6 @@ export function AdminLoginPage() {
           </div>
         </div>
       </main>
-
     </div>
   );
 }
