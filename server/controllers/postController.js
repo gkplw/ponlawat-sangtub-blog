@@ -219,12 +219,15 @@ export const getAllPosts = async (req, res) => {
     }
 
     if (status) {
-      // แปลง status string เป็น lowercase และหา status_id
-      const statusLower = status.toLowerCase();
-      if (statusLower === "published") {
-        query = query.eq("status_id", 2);
-      } else if (statusLower === "draft") {
-        query = query.eq("status_id", 1);
+      // หา status_id จาก status name
+      const { data: statusData } = await supabase
+        .from("statuses")
+        .select("id")
+        .eq("status", status)
+        .single();
+      
+      if (statusData) {
+        query = query.eq("status_id", statusData.id);
       }
     }
 

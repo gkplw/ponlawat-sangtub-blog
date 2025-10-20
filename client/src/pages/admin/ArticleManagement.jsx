@@ -159,7 +159,7 @@ export function ArticleManagement() {
             <SelectContent>
               <SelectItem value="all">All Status</SelectItem>
               {statuses.map(status => (
-                <SelectItem key={status.id} value={status.status.toLowerCase()}>
+                <SelectItem key={status.id} value={status.status}>
                   {status.status}
                 </SelectItem>
               ))}
