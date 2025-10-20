@@ -382,7 +382,7 @@ export function ViewPostPage() {
                         className="w-12 h-12 rounded-full bg-gray-200 object-cover"
                       />
                       <div className="flex-1">
-                        <p className="font-semibold">{comment.users?.username}</p>
+                        <p className="font-semibold">{comment.users?.name}</p>
                         <p className="mt-1 text-xs text-gray-500">
                           {new Date(comment.created_at).toLocaleDateString("en-GB", {
                             day: "numeric",

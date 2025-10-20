@@ -42,6 +42,7 @@ export function ArticleSection() {
         const response = await postsAPI.getAll({
           page,
           limit: 6,
+          status: "publish", // Only show published posts
           ...(category !== "Highlight" && { category }),
           ...(search && { keyword: search }),
         });
@@ -91,6 +92,7 @@ export function ArticleSection() {
       setSearchLoading(true);
       const response = await postsAPI.getAll({
         keyword: searchTerm,
+        status: "publish", // Only show published posts in search
         limit: 6, // จำกัดผลลัพธ์ให้แสดงแค่ 6 รายการ
       });
       setSearchResults(response.data.posts);
