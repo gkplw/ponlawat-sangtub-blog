@@ -107,7 +107,8 @@ export function EditArticle() {
     }
   };
 
-  const handleSave = async () => {
+  const handleSaveArticle = async (isDraft) => {
+    // Validation
     if (!articleData.title.trim()) {
       toast.error("Please enter article title");
       return;
@@ -125,16 +126,32 @@ export function EditArticle() {
       return;
     }
 
+    if (statuses.length === 0) {
+      toast.error("Status data not loaded. Please refresh the page.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
+      // Find status ID for draft or publish (matching database values)
+      const statusName = isDraft ? "draft" : "publish";
+      const status = statuses.find(s => s.status === statusName);
+      
+      if (!status) {
+        console.error("Available statuses:", statuses);
+        throw new Error(`Status "${statusName}" not found`);
+      }
+      
+      console.log("Selected status:", status);
+
       // Create FormData
       const formData = new FormData();
-      formData.append("title", articleData.title);
+      formData.append("title", articleData.title.trim());
       formData.append("category_id", articleData.category_id);
-      formData.append("description", articleData.description);
-      formData.append("content", articleData.content);
-      formData.append("status_id", articleData.status_id);
+      formData.append("description", articleData.description.trim());
+      formData.append("content", articleData.content.trim());
+      formData.append("status_id", status.id.toString());
       formData.append("image", articleData.image); // Keep existing image URL
       
       // Add new image file if selected
@@ -142,10 +159,14 @@ export function EditArticle() {
         formData.append("imageFile", imageFile);
       }
 
+      console.log("Updating article with status:", status.status, "ID:", status.id);
+
       await postsAPI.update(id, formData);
       
-      toast.success("Article updated", {
-        description: "Your article has been successfully updated",
+      toast.success(isDraft ? "Article saved as draft" : "Article published", {
+        description: isDraft 
+          ? "You can publish it later" 
+          : "Your article has been successfully published",
         duration: 3000,
       });
       
@@ -153,13 +174,16 @@ export function EditArticle() {
     } catch (error) {
       console.error("Update error:", error);
       toast.error("Failed to update article", {
-        description: error.response?.data?.message || "Please try again later",
+        description: error.response?.data?.message || error.message || "Please try again later",
         duration: 5000,
       });
     } finally {
       setIsSubmitting(false);
     }
   };
+
+  const handleSaveAsDraft = () => handleSaveArticle(true);
+  const handleSaveAndPublish = () => handleSaveArticle(false);
 
   const openDeleteModal = () => {
     setShowDeleteModal(true);
@@ -198,11 +222,19 @@ export function EditArticle() {
           <h1 className="text-2xl font-bold text-gray-800">Edit article</h1>
           <div className="flex items-center space-x-3">
             <Button
-              onClick={handleSave}
+              onClick={handleSaveAsDraft}
+              disabled={isSubmitting}
+              variant="outline"
+              className="px-8 py-2 border border-gray-300 rounded-full hover:bg-gray-50"
+            >
+              {isSubmitting ? "Saving..." : "Save as draft"}
+            </Button>
+            <Button
+              onClick={handleSaveAndPublish}
               disabled={isSubmitting}
               className="px-8 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
             >
-              {isSubmitting ? "Saving..." : "Save"}
+              {isSubmitting ? "Publishing..." : "Save and publish"}
             </Button>
           </div>
         </div>
