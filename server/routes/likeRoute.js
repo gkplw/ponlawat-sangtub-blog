@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { toggleLike, checkUserLike, getUserLikes } from "../controllers/likeController.js";
-import { protectUser } from "../middlewares/authValidator.js";
+import { authenticate } from "../middlewares/authValidator.js";
 
 const likeRouter = Router();
 
-likeRouter.post("/toggle", protectUser, toggleLike);
-likeRouter.get("/check/:postId", protectUser, checkUserLike);
-likeRouter.get("/user", protectUser, getUserLikes);
+likeRouter.post("/toggle", authenticate, toggleLike);
+likeRouter.get("/check/:postId", authenticate, checkUserLike);
+likeRouter.get("/user", authenticate, getUserLikes);
 
 export default likeRouter;
 

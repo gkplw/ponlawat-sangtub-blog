@@ -89,7 +89,7 @@ export function ViewPostPage() {
       setLikeCount(response.data.likes_count);
       
       toast.success(response.data.isLiked ? "Liked!" : "Unliked", {
-        description: response.data.isLiked ? "Added to your favorites" : "Removed from your favorites",
+        description: response.data.isLiked ? "Like successfully updated" : "Like successfully removed",
       });
     } catch (error) {
       console.error("Error toggling like:", error);

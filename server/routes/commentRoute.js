@@ -5,14 +5,14 @@ import {
   updateComment, 
   deleteComment 
 } from "../controllers/commentController.js";
-import { protectUser } from "../middlewares/authValidator.js";
+import { authenticate } from "../middlewares/authValidator.js";
 
 const commentRouter = Router();
 
-commentRouter.post("/", protectUser, createComment);
+commentRouter.post("/", authenticate, createComment);
 commentRouter.get("/post/:postId", getCommentsByPostId);
-commentRouter.put("/:id", protectUser, updateComment);
-commentRouter.delete("/:id", protectUser, deleteComment);
+commentRouter.put("/:id", authenticate, updateComment);
+commentRouter.delete("/:id", authenticate, deleteComment);
 
 export default commentRouter;
 
