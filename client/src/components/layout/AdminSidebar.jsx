@@ -22,11 +22,6 @@ export function AdminSidebar() {
       path: "/admin/profile"
     },
     {
-      icon: Bell,
-      label: "Notification",
-      path: "/admin/notifications"
-    },
-    {
       icon: Lock,
       label: "Reset password",
       path: "/admin/reset-password"

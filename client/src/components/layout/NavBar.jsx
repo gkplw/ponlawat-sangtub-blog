@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "../ui/dropdown-menu"
-import { Menu, Bell, ChevronDown, User, Lock, LogOut, LogIn, UserPlus } from "lucide-react"
+import { Menu, ChevronDown, User, Lock, LogOut, LogIn, UserPlus, LayoutDashboard } from "lucide-react"
 import { useAuth } from "../../context/authentication";
 
 export function NavBar({ variant = "auto" }) {
@@ -76,10 +76,6 @@ export function NavBar({ variant = "auto" }) {
 
         {/* Desktop - Right side - Notifications and Profile */}
         <div className="hidden md:flex items-center space-x-4">
-          {/* Notification Bell */}
-          <button className="text-gray-600 hover:text-gray-800 transition-colors">
-            <Bell className="w-5 h-5" />
-          </button>
 
           {/* Profile Section with Dropdown */}
           <DropdownMenu>
@@ -104,18 +100,33 @@ export function NavBar({ variant = "auto" }) {
             <DropdownMenuContent align="end" className="w-48 p-0 bg-[#F9F8F6]">
               {/* Menu Items */}
               <div className="py-2">
-                <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
-                  <Link to="/profile" className="flex items-center space-x-3 w-full">
-                    <User className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
-                  <Link to="/reset-password" className="flex items-center space-x-3 w-full">
-                    <Lock className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">Reset password</span>
-                  </Link>
-                </DropdownMenuItem>
+                {user.role === "admin" ? (
+                  // Admin menu
+                  <>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/admin/articles" className="flex items-center space-x-3 w-full">
+                        <LayoutDashboard className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Admin panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  // Regular user menu
+                  <>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/profile" className="flex items-center space-x-3 w-full">
+                        <User className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/reset-password" className="flex items-center space-x-3 w-full">
+                        <Lock className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Reset password</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <div className="border-t border-gray-200 my-1"></div>
                 <DropdownMenuItem 
                   className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
@@ -140,18 +151,33 @@ export function NavBar({ variant = "auto" }) {
             <DropdownMenuContent align="end" className="w-48 p-0 bg-[#F9F8F6]">
               {/* Menu Items */}
               <div className="py-2">
-                <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
-                  <Link to="/profile" className="flex items-center space-x-3 w-full">
-                    <User className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">Profile</span>
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
-                  <Link to="/reset-password" className="flex items-center space-x-3 w-full">
-                    <Lock className="w-5 h-5 text-gray-600" />
-                    <span className="text-gray-900">Reset password</span>
-                  </Link>
-                </DropdownMenuItem>
+                {user.role === "admin" ? (
+                  // Admin menu
+                  <>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/admin/articles" className="flex items-center space-x-3 w-full">
+                        <LayoutDashboard className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Admin panel</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  // Regular user menu
+                  <>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/profile" className="flex items-center space-x-3 w-full">
+                        <User className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Profile</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50">
+                      <Link to="/reset-password" className="flex items-center space-x-3 w-full">
+                        <Lock className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900">Reset password</span>
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
                 <div className="border-t border-gray-200 my-1"></div>
                 <DropdownMenuItem 
                   className="flex items-center space-x-3 px-4 py-3 hover:bg-gray-50 cursor-pointer"
