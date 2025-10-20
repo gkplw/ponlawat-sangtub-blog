@@ -154,6 +154,10 @@ export const authAPI = {
     return axios.get(`${API_BASE_URL}/auth/admin`);
   },
 
+  getAdminPublic: async () => {
+    return axios.get(`${API_BASE_URL}/auth/admin-public`);
+  },
+
   logout: async () => {
     return axios.post(`${API_BASE_URL}/auth/logout`);
   },

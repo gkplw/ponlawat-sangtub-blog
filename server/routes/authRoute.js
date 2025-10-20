@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, login, getUser, updateProfile, profilePictureUpload, uploadProfilePicture, resetPassword, logout, loginAdmin, resetPasswordAdmin, logoutAdmin, getAdmin } from "../controllers/authController.js";
+import { register, login, getUser, updateProfile, profilePictureUpload, uploadProfilePicture, resetPassword, logout, loginAdmin, resetPasswordAdmin, logoutAdmin, getAdmin, getAdminPublic } from "../controllers/authController.js";
 import { authenticate, protectUser, protectAdmin } from "../middlewares/authValidator.js";
 
 const authRouter = Router();
@@ -8,6 +8,7 @@ const authRouter = Router();
 authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.post("/login-admin", loginAdmin);
+authRouter.get("/admin-public", getAdminPublic);
 
 // Protected routes - for all authenticated users
 authRouter.get("/user", authenticate, getUser);

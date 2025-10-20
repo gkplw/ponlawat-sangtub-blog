@@ -351,7 +351,7 @@ export const logout = async (req, res) => {
 // ------------------------------------------------------------------------------------------
 
 // Admin Controller
-// Get admin
+// Get admin (protected)
 export const getAdmin = async (req, res) => {
     try {
       return res.status(200).json({
@@ -363,6 +363,32 @@ export const getAdmin = async (req, res) => {
       return res.status(500).json({ error: "Failed to fetch admin" });
     }
   };
+
+// Get admin public info (for Hero section - no auth required)
+export const getAdminPublic = async (req, res) => {
+  try {
+    const { data: adminData, error } = await supabase
+      .from("users")
+      .select("name, bio, profile_pic")
+      .eq("role", "admin")
+      .single();
+
+    if (error) {
+      console.error("Error fetching admin data:", error);
+      return res.status(500).json({ 
+        error: "Failed to fetch admin data"
+      });
+    }
+
+    return res.status(200).json({
+      message: "Fetched admin successfully",
+      user: adminData,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Failed to fetch admin" });
+  }
+};
 
 // Login admin
 export const loginAdmin = async (req, res) => {

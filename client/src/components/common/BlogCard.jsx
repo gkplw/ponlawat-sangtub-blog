@@ -1,8 +1,34 @@
-import authorImage from "../../assets/author-image.jpg";
 import { Link } from "react-router-dom";
+import { authAPI } from "../../services/api";
+import { useState, useEffect } from "react";
 
 export function BlogCard(props) {
-    const { id, image, category, title, description, author, date } = props;
+    const { id, image, category, title, description, date } = props;
+    
+    const [authorData, setAuthorData] = useState({
+      name: "",
+      profile_pic: ""
+    });
+  
+    useEffect(() => {
+      const fetchAuthorData = async () => {
+        try {
+          // ดึงข้อมูล admin (author) จาก API
+          const response = await authAPI.getAdminPublic();
+          setAuthorData({
+            name: response.data.user.name || "",
+            bio: response.data.user.bio || "",
+            profile_pic: response.data.user.profile_pic || ""
+          });
+        } catch (error) {
+          console.error("Error fetching author data:", error);
+        } finally {
+        }
+      };
+  
+      fetchAuthorData();
+    }, []);
+
     return (
       <div className="flex flex-col gap-4">
         <Link to={`/posts/${id}`} className="relative h-[212px] sm:h-[360px]">
@@ -23,8 +49,8 @@ export function BlogCard(props) {
             {description}
           </p>
           <div className="flex items-center text-sm">
-            <img className="w-12 h-12 rounded-full mr-2" src={authorImage} alt={author} />
-            <span>{author}</span>
+            <img className="w-12 h-12 rounded-full mr-2" src={authorData.profile_pic} alt={authorData.name} />
+            <span>{authorData.name}</span>
             <span className="mx-2 text-gray-300">|</span>
             <span>{date}</span>
           </div>
