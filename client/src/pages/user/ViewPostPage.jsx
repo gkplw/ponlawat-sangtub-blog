@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ReactMarkdown from "react-markdown";
-import authorImage from "@/assets/author-image.jpg";
 import { HeartPlus, Copy, Facebook, Twitter, Linkedin, X } from 'lucide-react';
 import { toast } from "sonner";
 import { NavBar } from "../../components/layout/NavBar";
@@ -9,6 +8,7 @@ import { Footer } from "../../components/layout/Footer";
 import { postsAPI, commentsAPI, likesAPI } from "../../services/api";
 import { useAuth } from "../../context/authentication";
 import { LoadingScreen } from "../../components/common/LoadingScreen";
+import { AsideAuthor } from "../../components/common/AsideAuthor";
 
 export function ViewPostPage() {
   const [post, setPost] = useState(null);
@@ -405,28 +405,7 @@ export function ViewPostPage() {
 
           {/* Aside: Author */}
           <aside className="order-2 lg:w-1/3">
-            <div className="bg-[#EFEEEB] rounded-xl p-6 lg:sticky lg:top-6">
-              <div className="border-b border-gray-300 pb-3 mb-3 flex items-center gap-3">
-                <img
-                  src={authorImage}
-                  alt={post.author}
-                  className="w-12 h-12 rounded-full"
-                />
-                <div>
-                  <p className="text-xs text-gray-500">Author</p>
-                  <p className="font-semibold">Author name</p>
-                </div>
-              </div>
-              <p className="text-sm text-gray-600 mt-4">
-                I am a pet enthusiast and freelance writer who specializes in
-                animal behavior and care. With a deep love for cats, I enjoy
-                sharing insights on feline companionship and wellness.
-              </p>
-              <p className="text-sm text-gray-600 mt-3">
-                When I'm not writing, I spend time volunteering at my local
-                animal shelter, helping cats find loving homes.
-              </p>
-            </div>
+              <AsideAuthor />
           </aside>
           </div>
         </main>
