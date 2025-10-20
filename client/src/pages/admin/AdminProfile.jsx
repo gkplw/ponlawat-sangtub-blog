@@ -1,22 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
 import { toast } from "sonner";
-import authorImage from "@/assets/author-image.jpg";
+import { useAuth } from "../../context/authentication";
+import { authAPI } from "../../services/api";
 
 export function AdminProfile() {
-  const [profileData, setProfileData] = useState({
-    name: "Thompson P.",
-    username: "thompson",
-    email: "thompson.p@gmail.com",
-    bio: "I am a pet enthusiast and freelance writer who specializes in animal behavior and care. With a deep love for cats, I enjoy sharing insights on feline companionship and wellness.\n\nWhen I'm not writing, I spends time volunteering at my local animal shelter, helping cats find loving homes."
+  const { state, fetchUser } = useAuth();
+  const user = state?.user || {};
+  
+  const [formData, setFormData] = useState({
+    name: "",
+    username: "",
+    email: "",
+    bio: ""
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef(null);
+
+  // Load user data when component mounts
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        username: user.username || "",
+        email: user.email || "",
+        bio: user.bio || ""
+      });
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfileData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -24,11 +42,17 @@ export function AdminProfile() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    setIsSaving(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await authAPI.updateProfile({
+        name: formData.name,
+        username: formData.username,
+        bio: formData.bio
+      });
+      
+      // Refresh user data
+      await fetchUser();
       
       toast.success("Saved profile", {
         description: "Your profile has been successfully updated",
@@ -36,21 +60,39 @@ export function AdminProfile() {
       });
     } catch (error) {
       console.error("Profile update error:", error);
-      toast.error("Update failed", {
-        description: "Please try again later",
-        duration: 5000,
-      });
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to save profile";
+      toast.error(errorMessage);
     } finally {
-      setIsSubmitting(false);
+      setIsSaving(false);
     }
   };
 
-  const handleUploadImage = () => {
-    // In a real app, this would open file picker
-    toast.info("Upload feature", {
-      description: "Image upload functionality would be implemented here",
-      duration: 3000,
-    });
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      await authAPI.uploadProfilePicture(file);
+      await fetchUser();
+      toast.success("Uploaded profile picture", {
+        description: "Your profile picture has been updated",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Upload error:", error);
+      const errorMessage = error.response?.data?.error || error.response?.data?.message || "Failed to upload";
+      toast.error(errorMessage);
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   return (
@@ -60,10 +102,10 @@ export function AdminProfile() {
         <h1 className="text-2xl font-bold text-gray-800">Profile</h1>
         <Button
           onClick={handleSubmit}
-          disabled={isSubmitting}
+          disabled={isSaving}
           className="px-8 py-2 bg-[#26231e] text-white rounded-full hover:bg-gray-700 transition-colors"
         >
-          {isSubmitting ? "Saving..." : "Save"}
+          {isSaving ? "Saving..." : "Save"}
         </Button>
       </div>
 
@@ -74,26 +116,27 @@ export function AdminProfile() {
           <div className="flex items-center space-x-4">
             <div className="w-20 h-20 bg-gray-200 rounded-full overflow-hidden">
               <img
-                src={authorImage}
-                alt="Profile"
+                src={user.profile_pic}
+                alt={user.name || user.username}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.target.style.display = 'none';
-                  e.target.nextSibling.style.display = 'flex';
-                }}
               />
-              <div className="w-full h-full bg-gray-300 flex items-center justify-center text-gray-500 text-xs" style={{display: 'none'}}>
-                No Image
-              </div>
             </div>
             <Button
               type="button"
-              onClick={handleUploadImage}
+              onClick={handleUploadClick}
               variant="outline"
               className="px-4 py-2 border border-gray-300 rounded-full hover:bg-gray-50"
+              disabled={isUploading}
             >
-              Upload profile picture
+              {isUploading ? "Uploading..." : "Upload profile picture"}
             </Button>
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
 
           {/* Name */}
@@ -105,7 +148,7 @@ export function AdminProfile() {
               id="name"
               name="name"
               type="text"
-              value={profileData.name}
+              value={formData.name}
               onChange={handleInputChange}
               className="w-100 bg-white border-gray-300"
             />
@@ -120,7 +163,7 @@ export function AdminProfile() {
               id="username"
               name="username"
               type="text"
-              value={profileData.username}
+              value={formData.username}
               onChange={handleInputChange}
               className="w-100 bg-white border-gray-300"
             />
@@ -135,7 +178,7 @@ export function AdminProfile() {
               id="email"
               name="email"
               type="email"
-              value={profileData.email}
+              value={formData.email}
               onChange={handleInputChange}
               className="w-100 bg-white border-gray-300"
               disabled
@@ -151,13 +194,13 @@ export function AdminProfile() {
               id="bio"
               name="bio"
               rows={6}
-              value={profileData.bio}
+              value={formData.bio}
               onChange={handleInputChange}
               maxLength={300}
-              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md"
+              className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-gray-400"
             />
             <div className="text-right text-sm text-gray-500 mt-1">
-              {profileData.bio.length}/300 characters
+              {formData.bio.length}/300 characters
             </div>
           </div>
         </form>

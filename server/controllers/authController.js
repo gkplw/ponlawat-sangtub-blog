@@ -155,11 +155,11 @@ export const getUser = async (req, res) => {
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, username } = req.body;
+    const { name, username, bio } = req.body;
     const userId = req.user.id;
 
-    if (!name && !username) {
-      return res.status(400).json({ error: "At least one field (name or username) is required" });
+    if (!name && !username && !bio) {
+      return res.status(400).json({ error: "At least one field (name, username, or bio) is required" });
     }
 
     // Check if username is already taken by another user
@@ -191,6 +191,7 @@ export const updateProfile = async (req, res) => {
     const updateData = {};
     if (name) updateData.name = name;
     if (username) updateData.username = username;
+    if (bio !== undefined) updateData.bio = bio; // Allow empty string to clear bio
 
     // Update user profile
     const { data, error } = await supabase
