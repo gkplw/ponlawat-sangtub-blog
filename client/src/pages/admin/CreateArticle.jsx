@@ -112,25 +112,35 @@ export function CreateArticle() {
       return;
     }
 
+    if (statuses.length === 0) {
+      toast.error("Status data not loaded. Please refresh the page.");
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
-      // Find status ID for draft or published
-      const statusName = isDraft ? "Draft" : "Published";
+      // Find status ID for draft or publish (matching database values)
+      const statusName = isDraft ? "draft" : "publish";
       const status = statuses.find(s => s.status === statusName);
       
       if (!status) {
-        throw new Error("Status not found");
+        console.error("Available statuses:", statuses);
+        throw new Error(`Status "${statusName}" not found`);
       }
+      
+      console.log("Selected status:", status);
 
       // Create FormData
       const formData = new FormData();
-      formData.append("title", articleData.title);
+      formData.append("title", articleData.title.trim());
       formData.append("category_id", articleData.category_id);
-      formData.append("description", articleData.description);
-      formData.append("content", articleData.content);
-      formData.append("status_id", status.id);
+      formData.append("description", articleData.description.trim());
+      formData.append("content", articleData.content.trim());
+      formData.append("status_id", status.id.toString());
       formData.append("imageFile", imageFile);
+
+      console.log("Submitting article with status:", status.status, "ID:", status.id);
 
       await postsAPI.create(formData);
       
@@ -145,7 +155,7 @@ export function CreateArticle() {
     } catch (error) {
       console.error("Save error:", error);
       toast.error("Failed to save article", {
-        description: error.response?.data?.message || "Please try again later",
+        description: error.response?.data?.message || error.message || "Please try again later",
         duration: 5000,
       });
     } finally {

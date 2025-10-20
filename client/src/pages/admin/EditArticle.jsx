@@ -128,15 +128,21 @@ export function EditArticle() {
     setIsSubmitting(true);
     
     try {
-      // Update article data (without image for now)
-      await postsAPI.update(id, {
-        title: articleData.title,
-        image: articleData.image, // Keep existing image URL
-        category_id: parseInt(articleData.category_id),
-        description: articleData.description,
-        content: articleData.content,
-        status_id: parseInt(articleData.status_id),
-      });
+      // Create FormData
+      const formData = new FormData();
+      formData.append("title", articleData.title);
+      formData.append("category_id", articleData.category_id);
+      formData.append("description", articleData.description);
+      formData.append("content", articleData.content);
+      formData.append("status_id", articleData.status_id);
+      formData.append("image", articleData.image); // Keep existing image URL
+      
+      // Add new image file if selected
+      if (imageFile) {
+        formData.append("imageFile", imageFile);
+      }
+
+      await postsAPI.update(id, formData);
       
       toast.success("Article updated", {
         description: "Your article has been successfully updated",

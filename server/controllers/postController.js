@@ -122,11 +122,60 @@ export const getPostById = async (req, res) => {
 export const updatePost = async (req, res) => {
   try {
     const { id } = req.params;
-    const { title, image, category_id, description, content, status_id } = req.body;
+    const { title, category_id, description, content, status_id } = req.body;
+
+    let imageUrl = req.body.image; // Keep existing image by default
+
+    // Check if new image file is uploaded
+    if (req.files && req.files.imageFile && req.files.imageFile[0]) {
+      const file = req.files.imageFile[0];
+      const bucketName = "personal-blog";
+      const filePath = `posts/${Date.now()}_${file.originalname}`;
+
+      // Upload new image to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from(bucketName)
+        .upload(filePath, file.buffer, {
+          contentType: file.mimetype,
+          upsert: false,
+        });
+
+      if (uploadError) {
+        console.error("Upload error:", uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL of the uploaded file
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(uploadData.path);
+
+      imageUrl = publicUrl;
+
+      // Optional: Delete old image from storage if it exists and is from our bucket
+      if (req.body.image && req.body.image.includes(bucketName)) {
+        try {
+          const oldFilePath = req.body.image.split(`${bucketName}/`)[1];
+          if (oldFilePath) {
+            await supabase.storage.from(bucketName).remove([oldFilePath]);
+          }
+        } catch (deleteError) {
+          console.error("Error deleting old image:", deleteError);
+          // Continue even if deletion fails
+        }
+      }
+    }
 
     const { data, error } = await supabase
       .from("posts")
-      .update({ title, image, category_id, description, content, status_id })
+      .update({ 
+        title, 
+        image: imageUrl, 
+        category_id, 
+        description, 
+        content, 
+        status_id 
+      })
       .eq("id", id)
       .select()
       .single();

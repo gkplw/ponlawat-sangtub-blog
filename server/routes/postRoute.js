@@ -7,7 +7,7 @@ const postRouter = Router();
 
 postRouter.post("/", imageFileUpload, validatePostInputWithFile, protectAdmin, createPost);
 postRouter.get("/:id", getPostById);
-postRouter.put("/:id", validatePostInput, protectAdmin, updatePost);
+postRouter.put("/:id", imageFileUpload, validatePostInput, protectAdmin, updatePost);
 postRouter.delete("/:id", protectAdmin, deletePost);
 postRouter.get("/", getAllPosts);
 
