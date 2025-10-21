@@ -75,8 +75,10 @@ export function ArticleSection() {
     };
 
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
   }, []);
 
@@ -150,8 +152,15 @@ export function ArticleSection() {
                 searchResults.map((article) => (
                   <div
                     key={article.id}
-                    onClick={() => handleSelectArticle(article.id)}
-                    className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelectArticle(article.id);
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      handleSelectArticle(article.id);
+                    }}
+                    className="p-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                   >
                     <h3 className="font-medium text-sm text-gray-900 line-clamp-1">
                       {article.title}
@@ -243,8 +252,15 @@ export function ArticleSection() {
                 searchResults.map((article) => (
                   <div
                     key={article.id}
-                    onClick={() => handleSelectArticle(article.id)}
-                    className="p-3 hover:bg-gray-50 cursor-pointer border-b border-gray-100 last:border-b-0"
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleSelectArticle(article.id);
+                    }}
+                    onTouchStart={(e) => {
+                      e.preventDefault();
+                      handleSelectArticle(article.id);
+                    }}
+                    className="p-3 hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b border-gray-100 last:border-b-0"
                   >
                     <h3 className="font-medium text-sm text-gray-900 line-clamp-1">
                       {article.title}
