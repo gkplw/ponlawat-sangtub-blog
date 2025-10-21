@@ -155,6 +155,13 @@ export function LoginPage() {
                 </Link>
               </p>
             </div>
+
+            {/* Test Login Credentials */}
+            <div className="text-center mt-4 sm:mt-6">
+              <p className="text-sm sm:text-base text-gray-600">
+                Email: test@example.com <br /> Password: 123456789
+              </p>
+            </div>
           </div>
         </div>
       </main>
