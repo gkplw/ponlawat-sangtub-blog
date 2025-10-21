@@ -228,13 +228,17 @@ export function ViewPostPage() {
         </h1>
 
         <div className="flex flex-col lg:flex-row gap-4 lg:gap-10">
-          {/* Content */}
           <article className="order-1 lg:flex-1 lg:w-2/3">
+
+            {/* Description */}
+            <p className="text-gray-700 text-lg lg:text-xl mt-7 lg:mt-7 lg:mb-4">{post.description}</p>
+
             <section className="markdown text-gray-700">
-              <ReactMarkdown>{post.content}</ReactMarkdown>
+            {/* Content */}
+            <ReactMarkdown>{post.content}</ReactMarkdown>
             </section>
 
-        {/* Like / Share */}
+            {/* Like / Share */}
             <div className="mt-8 rounded-lg p-3 bg-[#EFEEEB] space-y-3 lg:space-y-0">
               {/* Mobile Layout */}
               <div className="lg:hidden">
