@@ -286,7 +286,7 @@ export function ArticleSection() {
 
       {/* View More Link */}
       {!loading && page < totalPages && (
-        <div className="flex justify-center mt-4 mb-4">
+        <div className="flex justify-center md:mt-4 mb-7 md:mb-6">
           <button 
             onClick={() => setPage((prev) => prev + 1)}
             className="text-[#26231E] hover:text-gray-600 underline cursor-pointer transition-colors"
