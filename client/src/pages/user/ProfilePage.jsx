@@ -124,7 +124,7 @@ export function ProfilePage() {
             <div className="flex-1">
               <div className="bg-[#efeeeb] rounded-2xl p-4 sm:p-8 max-w-lg">
               {/* Profile Picture Section */}
-              <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 mb-6 sm:mb-8">
+              <div className="flex flex-col sm:flex-row items-center space-y-0 sm:space-x-6 mb-6 sm:mb-8">
                 <div className="w-20 h-20 rounded-full bg-gray-200 overflow-hidden">
                   <img 
                     src={user.profile_pic} 
