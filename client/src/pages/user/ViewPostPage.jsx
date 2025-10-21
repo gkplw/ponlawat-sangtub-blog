@@ -402,7 +402,7 @@ export function ViewPostPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-center text-gray-500">No comments yet. Be the first to comment!</p>
+                <p className="text-center text-gray-500 mb-4 md:mb-0">No comments yet. Be the first to comment!</p>
               )}
             </div>
           </article>
