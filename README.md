@@ -55,7 +55,8 @@ You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
 
 ## Database Schema
 
-<img width="1462" height="730" alt="supabase-schema-njputqqqeyotglgugxbj" src="https://github.com/user-attachments/assets/60331868-cb37-4fa0-b118-ad0d15729635" />
+<img width="1462" height="730" alt="supabase-schema-njputqqqeyotglgugxbj" src="https://github.com/user-attachments/assets/5827f73d-bca6-457c-a1dd-f81339137a60" />
+
 
 
 
