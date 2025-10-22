@@ -2,35 +2,34 @@
 
 A personal blogging platform designed for both writers and readers. This system allows authors to easily create, manage, and publish content while giving readers a seamless browsing experience. With features like article categorization, author profiles, and interactive elements such as comments and likes, this platform aims to foster a vibrant community of content creators and consumers.
 
+![Screenshot 2025-10-22 122939](https://github.com/user-attachments/assets/05ee581b-ae40-4b42-be8d-351c7938bb65)
+
+## Deployed Website
+
+You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
+
 ## Tech Stack
 
-### Frontend
-- **React 19** + **Vite** - Modern UI framework with fast build tooling
-- **TailwindCSS** - Utility-first CSS framework
-- **React Router** - Client-side routing
-- **Axios** - HTTP client with JWT interceptors
-- **React Markdown** - Markdown rendering for articles
-- **Sonner** - Toast notifications
-
-### Backend
-- **Express.js** - Node.js web framework
-- **Supabase** - PostgreSQL database
-- **JWT** - Authentication & authorization
-- **bcryptjs** - Password hashing
-- **Multer** - File upload handling
+- **React 19** + **Vite**
+- **TailwindCSS**
+- **React Router**
+- **Axios**
+- **Express.js**
+- **Supabase**
+- **Vercel**
 
 ## Features
 
-- 🔐 User authentication (signup, login, reset password)
-- 👤 User profiles and personalized dashboards
-- 📝 Create and edit articles with Markdown support
-- 🗂️ Category management
-- 💬 Comments system
-- ❤️ Like/unlike posts
-- 🛡️ Admin panel
-- 📊 Article management dashboard
-- 🔍 Article filtering and pagination
-- 📱 Responsive design
+- User authentication (signup, login, reset password)
+- User profiles and personalized dashboards
+- Create and edit articles with Markdown support
+- Category management
+- Comments system
+- Like/unlike posts
+- Admin panel
+- Article management dashboard
+- Article filtering and pagination
+- Responsive design
 
 ## Project Structure
 
@@ -52,78 +51,9 @@ A personal blogging platform designed for both writers and readers. This system 
     └── utils/              # Helper utilities
 ```
 
-## Setup Instructions
-
-### Prerequisites
-- Node.js (v16+)
-- npm or yarn
-- Supabase account
-
-### Environment Variables
-
-Create `.env` file in the `server/` directory:
-
-```env
-SUPABASE_URL=your_supabase_url
-SUPABASE_ANON_KEY=your_supabase_anon_key
-JWT_SECRET=your_jwt_secret
-```
-
-### Installation
-
-1. **Install server dependencies:**
-```bash
-cd server
-npm install
-```
-
-2. **Install client dependencies:**
-```bash
-cd client
-npm install
-```
-
-### Running the Application
-
-1. **Start the backend server:**
-```bash
-cd server
-npm start
-# Runs on http://localhost:4000
-```
-
-2. **Start the frontend dev server:**
-```bash
-cd client
-npm run dev
-# Runs on http://localhost:5173
-```
-
-## API Endpoints
-
-| Endpoint | Description |
-|----------|-------------|
-| `/auth/*` | Authentication routes (login, register, reset password) |
-| `/posts/*` | Post CRUD operations |
-| `/categories/*` | Category management |
-| `/comments/*` | Comment operations |
-| `/likes/*` | Like/unlike posts |
-| `/statuses/*` | Post status management |
-
-## Build for Production
-
-```bash
-cd client
-npm run build
-```
-
-The optimized production build will be in `client/dist/`.
-
 ## Database Schema
 
-See `supabase-schema.png` for the complete database structure.
+<img width="1462" height="730" alt="supabase-schema-njputqqqeyotglgugxbj" src="https://github.com/user-attachments/assets/60331868-cb37-4fa0-b118-ad0d15729635" />
 
-## License
 
-ISC
 
