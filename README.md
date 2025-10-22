@@ -4,6 +4,8 @@ A personal blogging platform designed for both writers and readers. This system 
 
 ![Screenshot 2025-10-22 122939](https://github.com/user-attachments/assets/05ee581b-ae40-4b42-be8d-351c7938bb65)
 
+![Screenshot 2025-10-22 143854](https://github.com/user-attachments/assets/f438373c-dd6f-4a53-bd97-e3cd54474754)
+
 ## Deployed Website
 
 You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
