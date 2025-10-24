@@ -10,6 +10,11 @@ A personal blogging platform designed for both writers and readers. This system 
 
 You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
 
+## Test Login Credentials
+
+Email: test@example.com
+Password: 123456789
+
 ## Tech Stack
 
 - **React 19** + **Vite**
