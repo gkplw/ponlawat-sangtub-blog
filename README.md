@@ -8,7 +8,7 @@ A personal blogging platform designed for both writers and readers. This system 
 
 ## Deployed Website
 
-You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
+You can check the project at: https://ponlawat-sangtub-blog.vercel.app/
 
 ## Test Login Credentials
 
