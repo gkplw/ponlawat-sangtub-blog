@@ -12,8 +12,8 @@ You can check the project at : https://ponlawat-sangtub-blog.vercel.app/
 
 ## Test Login Credentials
 
-**Email: test@example.com
-**Password: 123456789
+- Email: test@example.com
+- Password: 123456789
 
 ## Tech Stack
 
